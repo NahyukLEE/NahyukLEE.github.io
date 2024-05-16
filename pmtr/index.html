@@ -50,7 +50,7 @@
       <span aria-hidden="true"></span>
     </a>
   </div>
-  <div class="navbar-menu">
+  <!-- <div class="navbar-menu">
     <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
       <a class="navbar-item" href="https://keunhong.com">
       <span class="icon">
@@ -79,7 +79,7 @@
       </div>
     </div>
 
-  </div>
+  </div> -->
 </nav>
 
 
@@ -89,31 +89,36 @@
       <div class="columns is-centered">
         <div class="column has-text-centered">
           <h1 class="title is-1 publication-title">3D Geometric Shape Assembly via<br>Efficient Point Cloud Matching</h1>
+          <span class="title is-4 publication-venue">ICML 2024<br><br></span>
           <div class="is-size-5 publication-authors">
             <span class="author-block">
-              <a href="https://nahyuklee.github.io">Nahyuk Lee</a><sup>*</sup><sup>1</sup>,</span>
+              <a href="https://nahyuklee.github.io">Nahyuk Lee</a><sup>* </sup><sup>1</sup>&nbsp;&nbsp;&nbsp;&nbsp;</span>
             <span class="author-block">
-              <a href="https://juhongm999.github.io">Juhong Min</a><sup>*</sup><sup>2</sup>,</span>
+              <a href="https://juhongm999.github.io">Juhong Min</a><sup>* </sup><sup>1</sup>&nbsp;&nbsp;&nbsp;&nbsp;</span>
             <span class="author-block">
-              <a href="https://junha-l.github.io">Junha Lee</a><sup>2</sup>,
+              <a href="https://junha-l.github.io">Junha Lee</a><sup>1</sup>&nbsp;&nbsp;&nbsp;&nbsp;
             </span>
             <span class="author-block">
-              <a href="https://wookiekim.github.io/">Seungwook Kim</a><sup>2</sup>,
+              <a href="https://wookiekim.github.io/">Seungwook Kim</a><sup>1</sup>&nbsp;&nbsp;&nbsp;
             </span>
             <span class="author-block">
-              <a href="">Kanghee Lee</a><sup>2</sup>,
+              <a href="">Kanghee Lee</a><sup>2</sup>&nbsp;&nbsp;&nbsp;
             </span>
             <span class="author-block">
-              <a href="https://jaesik.info">Jaesik Park</a><sup>1,2</sup>,
+              <a href="https://jaesik.info">Jaesik Park</a><sup>2</sup>&nbsp;&nbsp;&nbsp;
             </span>
             <span class="author-block">
-              <a href="https://cvlab.postech.ac.kr/~mcho/">Minsu Cho</a><sup>2</sup>
+              <a href="https://cvlab.postech.ac.kr/~mcho/">Minsu Cho</a><sup>1</sup>
             </span>
           </div>
 
           <div class="is-size-5 publication-authors">
-            <span class="author-block"><sup>1</sup>Pohang University of Science and Engineering (POSTECH)</span>
-            <span class="author-block"><sup>2</sup>Seoul National University</span>
+            <span class="author-block"><sup>1 </sup>Pohang University of Science and Engineering (POSTECH)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <span class="author-block"><sup>2 </sup>Seoul National University</span>
+          </div>
+
+          <div class="is-size-6 publication-authors">
+            <span class="author-block">(* equal contribution)</span>
           </div>
 
           <div class="column has-text-centered">
@@ -121,7 +126,7 @@
 
               <!-- PDF Link. -->
               <span class="link-block">
-                <a href="https://arxiv.org/pdf/2011.12948"
+                <a href=""
                    class="external-link button is-normal is-rounded is-dark">
                   <span class="icon">
                       <i class="fas fa-file-pdf"></i>
@@ -132,7 +137,7 @@
 
               <!-- arXiv Link. -->
               <span class="link-block">
-                <a href="https://arxiv.org/abs/2011.12948"
+                <a href=""
                    class="external-link button is-normal is-rounded is-dark">
                   <span class="icon">
                       <i class="ai ai-arxiv"></i>
@@ -152,6 +157,17 @@
                   </a>
               </span>
 
+              <!-- Bibtex -->
+              <span class="link-block">
+                <a href="#bibtex"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-obp"></i>
+                  </span>
+                  <span>BibTex</span>
+                </a>
+              </span>
+
 
             </div>
           </div>
@@ -161,7 +177,7 @@
   </div>
 </section>
 
-<section class="hero teaser">
+<!-- <section class="hero teaser">
   <div class="container is-max-desktop">
     <div class="hero-body">
       <video id="teaser" autoplay muted loop playsinline height="100%">
@@ -175,10 +191,10 @@
       </h2>
     </div>
   </div>
-</section>
+</section> -->
 
 
-<section class="hero is-light is-small">
+<!-- <section class="hero is-light is-small">
   <div class="hero-body">
     <div class="container">
       <div id="results-carousel" class="carousel results-carousel">
@@ -233,7 +249,7 @@
       </div>
     </div>
   </div>
-</section>
+</section> -->
 
 
 <section class="section">
@@ -244,31 +260,11 @@
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
           <p>
-            We present the first method capable of photorealistically reconstructing a non-rigidly
-            deforming scene using photos/videos captured casually from mobile phones.
-          </p>
-          <p>
-            Our approach augments neural radiance fields
-            (NeRF) by optimizing an
-            additional continuous volumetric deformation field that warps each observed point into a
-            canonical 5D NeRF.
-            We observe that these NeRF-like deformation fields are prone to local minima, and
-            propose a coarse-to-fine optimization method for coordinate-based models that allows for
-            more robust optimization.
-            By adapting principles from geometry processing and physical simulation to NeRF-like
-            models, we propose an elastic regularization of the deformation field that further
-            improves robustness.
-          </p>
-          <p>
-            We show that <span class="dnerf">Nerfies</span> can turn casually captured selfie
-            photos/videos into deformable NeRF
-            models that allow for photorealistic renderings of the subject from arbitrary
-            viewpoints, which we dub <i>"nerfies"</i>. We evaluate our method by collecting data
-            using a
-            rig with two mobile phones that take time-synchronized photos, yielding train/validation
-            images of the same pose at different viewpoints. We show that our method faithfully
-            reconstructs non-rigidly deforming scenes and reproduces unseen views with high
-            fidelity.
+            Learning to assemble geometric shapes into a larger target structure is a pivotal task in various practical applications.
+            In this work, we tackle this problem by establishing local correspondences between point clouds of part shapes in both coarse and fine levels. 
+            To this end, we introduce Proxy Match Transform (PMT), an approximate high-order feature transform layer that enables reliable matching between mating surfaces of parts while incurring low costs in memory and compute. 
+            Building upon PMT, we introduce a new framework, dubbed Proxy Match TransformeR (PMTR), for the geometric assembly task.
+            We evaluate the proposed PMTR on the large-scale 3D shape assembly dataset, BreakingBad, and demonstrate its superior performance and efficiency compared to state-of-the-art methods.
           </p>
         </div>
       </div>
@@ -429,47 +425,33 @@
 
 <section class="section" id="BibTeX">
   <div class="container is-max-desktop content">
-    <h2 class="title">BibTeX</h2>
-    <pre><code>@article{park2021nerfies,
-  author    = {Park, Keunhong and Sinha, Utkarsh and Barron, Jonathan T. and Bouaziz, Sofien and Goldman, Dan B and Seitz, Steven M. and Martin-Brualla, Ricardo},
-  title     = {Nerfies: Deformable Neural Radiance Fields},
-  journal   = {ICCV},
-  year      = {2021},
+    <h2 class="title"><a id="bibtex">BibTeX</a></h2>
+    <pre><code>@inproceedings{lee2024pmtr,
+  author    = {Lee, Nahyuk and Min, Jujong and Lee, Junha and Kim, Seungwook and Lee, Kanghee and Park, Jaesik and Cho, Minsu},
+  title     = {3D Geometric Shape Assembly via Efficient Point Cloud Matching},
+  booktitle = {Proceedings of the International Conference on Machine Learning (ICML)},
+  year      = {2024},
 }</code></pre>
   </div>
 </section>
 
 
 <footer class="footer">
-  <div class="container">
-    <div class="content has-text-centered">
-      <a class="icon-link"
-         href="./static/videos/nerfies_paper.pdf">
-        <i class="fas fa-file-pdf"></i>
-      </a>
-      <a class="icon-link" href="https://github.com/keunhong" class="external-link" disabled>
-        <i class="fab fa-github"></i>
-      </a>
-    </div>
-    <div class="columns is-centered">
-      <div class="column is-8">
-        <div class="content">
-          <p>
-            This website is licensed under a <a rel="license"
-                                                href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
-            Commons Attribution-ShareAlike 4.0 International License</a>.
-          </p>
-          <p>
-            This means you are free to borrow the <a
-              href="https://github.com/nerfies/nerfies.github.io">source code</a> of this website,
-            we just ask that you link back to this page in the footer.
-            Please remember to remove the analytics code included in the header of the website which
-            you do not want on your website.
-          </p>
-        </div>
+  <div class="columns is-centered">
+    <div class="column is-8">
+      <div class="content">
+        <p>
+          This website is licensed under a <a rel="license"
+                                              href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+          Commons Attribution-ShareAlike 4.0 International License</a>.
+        </p>
+        <p>
+          Website adapted from the following <a href="https://github.com/nerfies/nerfies.github.io">source code</a>.
+        </p>
       </div>
     </div>
   </div>
+</div>
 </footer>
 
 </body>
