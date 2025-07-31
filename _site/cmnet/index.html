@@ -49,7 +49,7 @@
         <div class="column has-text-centered">
           <h1 class="title is-1 publication-title">Combinative Matching<br><span class="title is-4">for Geometric Shape Assembly</span></h1>
           
-          <span class="title is-4 publication-venue">ICCV 2025 <span class="publication-awards">Highlight</span><br><br></span>
+          <span class="title is-4 publication-venue">ICCV 2025 <span style="background: linear-gradient(-45deg, #8B5CF6, #10B981, #EF4444, #8B5CF6); background-size: 400% 400%; animation: gradient 3s ease infinite; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: bold;">Highlight</span> ✨<br><br></span>
           <div class="is-size-5 publication-authors">
             <span class="author-block">
               <a href="https://nahyuklee.github.io">Nahyuk Lee</a><sup>1</sup><sup>* </sup>&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -163,28 +163,30 @@
             <div class="content has-text-centered">
               <img src="./static/images/cmnet/equative.png" width="100%">
             </div>
-            We introduce a new form of <b>low-complexity high-order feature transform layer</b>, dubbed Proxy Match Transform (PMT), designed to align analogous local embeddings in feature space with <b>sub-quadratic</b> complexity.
-            The PMT layer provides a low-complexity yet high-order approach to geometric shape assembly, effectively approximating conventional high-order feature transforms under particular conditions.<br><br>
+            Traditional shape matching methods like <a href="https://github.com/qinzheng93/GeoTransformer">GeoTransformer [CVPR'23]</a> and <a href="https://nahyuklee.github.io/pmtr/">PMTR [ICML'24]</a> rely on <b>equative matching</b>, which assumes that mating parts resemble each other at their surfaces. While technically sound, this approach often falls short in geometric shape assembly, where parts are not merely visually similar—as in point cloud registration—but are structurally complementary.
+            <blockquote style="border-left: 4px solid #00d1b2; padding: 1rem; margin: 1rem 0; background-color: #f0f9ff; font-style: italic;">
+              <strong>Then, what do we miss? 🤔</strong> <br> Geometric shape assembly requires more than visual resemblance—it demands <b>complementary properties: surfaces must not only look alike but also fit by occupying opposite volumes</b>.
+            </blockquote>
+            <br>
           </p>
         </div>
-
-        <h2 class="title is-4">Learning to interlock parts: <strong>Combinative Matching</strong></h2>
+        <h2 class="title is-3">Learning to interlock parts: <span style="background: linear-gradient(45deg, #8B5CF6, #10B981, #EF4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: bold; text-shadow: 2px 2px 4px rgba(139, 92, 246, 0.3); font-size: 1.1em;">Combinative Matching</span></h2>
         <div class="content has-text-justified">
           <p>
             <div class="content has-text-centered">
               <img src="./static/images/cmnet/concept.png" width="100%">
             </div>
-            We introduce a new form of <b>low-complexity high-order feature transform layer</b>, dubbed Proxy Match Transform (PMT), designed to align analogous local embeddings in feature space with <b>sub-quadratic</b> complexity.
-            The PMT layer provides a low-complexity yet high-order approach to geometric shape assembly, effectively approximating conventional high-order feature transforms under particular conditions.<br><br>
+            We introduce <b><i>Combinative Matching</i></b>, a novel approach that addresses the dual requirements of geometric assembly: identical surface shape and opposite volume occupancy. To ensure consistent matching under arbitrary part poses, it first aligns <span style="color: #8B5CF6; font-weight: bold;">(1) local orientations</span> between surface points, establishing a shared reference frame. Within this frame, the method jointly performs <span style="color: #10B981; font-weight: bold;">(2) shape matching</span> to find visually similar regions and <span style="color: #EF4444; font-weight: bold;">(3) occupancy matching</span> to enforce volumetric complementarity—allowing parts to interlock properly.
+            <!-- <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 8px; margin: 1rem 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+              We introduce <b><i>Combinative Matching</i></b>, a novel approach that addresses the dual requirements of geometric assembly: identical surface shape and opposite volume occupancy. To ensure consistent matching under arbitrary part poses, it first aligns <span style="color: #FFD700; font-weight: bold;">(1) local orientations</span> between surface points, establishing a shared reference frame. Within this frame, the method jointly performs <span style="color: #98FB98; font-weight: bold;">(2) shape matching</span> to find visually similar regions and <span style="color: #FFB6C1; font-weight: bold;">(3) occupancy matching</span> to enforce volumetric complementarity—allowing parts to interlock properly.
+            </div> -->
           </p>
           <h2 class="title is-4 has-text-centered">Combinative Matching Network (CMNet)</h2>
           <p>
             <div class="content has-text-centered">
               <img src="./static/images/cmnet/architecture.png" width="100%">
             </div>
-            Building upon PMT, we introduce a new framework, dubbed <b>Proxy Match TransformeR (PMTR)</b>, for the geometric assembly task. 
-            We incorporate the PMT layer into PMTR, that uses PMTs for both coarse- and fine-level matching steps to establish correspondences on mating surfaces.
-            The proposed architecture comprises four main parts: (1) feature extraction, (2) coarse-level matching, (3) fine-level matching, and (4) transformation prediction.
+            Building upon the concept of combinative matching, we introduce a new framework, <b><i>Combinative Matching Network (CMNet)</i></b>, designed for robust geometric shape assembly. CMNet jointly leverages surface resemblance and volumetric complementarity to establish reliable correspondences on mating surfaces. The proposed architecture consists of four main components: (1) feature extraction and orientation alignment, (2) surface shape matching, (3) volume occupancy matching, and (4) transformation estimation.
           </p>
         </div>
       </div>
@@ -193,15 +195,13 @@
 <section class="hero is-light is-small">
   <div class="hero-body">
     <div class="container is-max-desktop has-text-centered">
-      <h2 class="title is-3">Efficiency of PMT</h2>
+      <h2 class="title is-3">Quantitative Comparison</h2>
       <div class="content has-text-justified">
           <p>
             <div class="content has-text-centered">
-            <img src="./static/images/pmtr/pmtr_efficiency.png" width="100%">
+            <img src="./static/images/cmnet/quan.png" width="100%">
             </div>
-            To demonstrate the superiority of the proposed PMT, we provide the efficiency comparison between different matchers, e.g., Geometric Transformer by Qin et al. (2022) and Proxy Match Transform (PMT), both during training and inference phases.
-            The results clearly indicates that PMT delivers substantial reductions not only in training/inference time but also in memory requirements. Notably, PMT is approximately <b>×21.5</b> more efficient in FLOPS, needs <b>×3.4</b> more compact number of parameters, and <b>×3.28 / ×11.07</b> less required memory for training/inference phases compared to GeoTr. 
-            Such efficiency is crucial, as it facilitates the practical deployment of our fine-level matcher for intricate matching tasks
+            🔉 <b>NOTE:</b> In main paper, we conducted experiments on the <b>volume-constrained Breaking Bad dataset</b> in which the volume of every piece is at least 1/40 of the total shape volume, reducing extreme point density imbalance. Results on vanilla version are provided in the supplementary.
           </p>
       </div>
     </div>
