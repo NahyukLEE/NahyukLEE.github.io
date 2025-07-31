@@ -47,7 +47,7 @@
     <div class="container is-max-desktop">
       <div class="columns is-centered">
         <div class="column has-text-centered">
-          <h1 class="title is-1 publication-title">Combinative Matching<br><span class="title is-3">for Geometric Shape Assembly</span></h1>
+          <h1 class="title is-1 publication-title">Combinative Matching<br><span class="title is-4">for Geometric Shape Assembly</span></h1>
           
           <span class="title is-4 publication-venue">ICCV 2025 <span class="publication-awards">Highlight</span><br><br></span>
           <div class="is-size-5 publication-authors">
@@ -151,6 +151,63 @@
     </div>
   </div>
   </section>
+
+
+  <section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-max-desktop has-text-centered">
+      <div class="column is-five-fifths">
+        <h2 class="title is-3">What's this project about?</h2>
+        <div class="content has-text-justified">
+          <p>
+            <div class="content has-text-centered">
+              <img src="./static/images/cmnet/equative.png" width="100%">
+            </div>
+            We introduce a new form of <b>low-complexity high-order feature transform layer</b>, dubbed Proxy Match Transform (PMT), designed to align analogous local embeddings in feature space with <b>sub-quadratic</b> complexity.
+            The PMT layer provides a low-complexity yet high-order approach to geometric shape assembly, effectively approximating conventional high-order feature transforms under particular conditions.<br><br>
+          </p>
+        </div>
+
+        <h2 class="title is-4">Learning to interlock parts: <strong>Combinative Matching</strong></h2>
+        <div class="content has-text-justified">
+          <p>
+            <div class="content has-text-centered">
+              <img src="./static/images/cmnet/concept.png" width="100%">
+            </div>
+            We introduce a new form of <b>low-complexity high-order feature transform layer</b>, dubbed Proxy Match Transform (PMT), designed to align analogous local embeddings in feature space with <b>sub-quadratic</b> complexity.
+            The PMT layer provides a low-complexity yet high-order approach to geometric shape assembly, effectively approximating conventional high-order feature transforms under particular conditions.<br><br>
+          </p>
+          <h2 class="title is-4 has-text-centered">Combinative Matching Network (CMNet)</h2>
+          <p>
+            <div class="content has-text-centered">
+              <img src="./static/images/cmnet/architecture.png" width="100%">
+            </div>
+            Building upon PMT, we introduce a new framework, dubbed <b>Proxy Match TransformeR (PMTR)</b>, for the geometric assembly task. 
+            We incorporate the PMT layer into PMTR, that uses PMTs for both coarse- and fine-level matching steps to establish correspondences on mating surfaces.
+            The proposed architecture comprises four main parts: (1) feature extraction, (2) coarse-level matching, (3) fine-level matching, and (4) transformation prediction.
+          </p>
+        </div>
+      </div>
+    </div>
+</section>
+<section class="hero is-light is-small">
+  <div class="hero-body">
+    <div class="container is-max-desktop has-text-centered">
+      <h2 class="title is-3">Efficiency of PMT</h2>
+      <div class="content has-text-justified">
+          <p>
+            <div class="content has-text-centered">
+            <img src="./static/images/pmtr/pmtr_efficiency.png" width="100%">
+            </div>
+            To demonstrate the superiority of the proposed PMT, we provide the efficiency comparison between different matchers, e.g., Geometric Transformer by Qin et al. (2022) and Proxy Match Transform (PMT), both during training and inference phases.
+            The results clearly indicates that PMT delivers substantial reductions not only in training/inference time but also in memory requirements. Notably, PMT is approximately <b>×21.5</b> more efficient in FLOPS, needs <b>×3.4</b> more compact number of parameters, and <b>×3.28 / ×11.07</b> less required memory for training/inference phases compared to GeoTr. 
+            Such efficiency is crucial, as it facilitates the practical deployment of our fine-level matcher for intricate matching tasks
+          </p>
+      </div>
+    </div>
+  </div>
+  </section>
+
 
 <section class="section" id="BibTeX">
   <div class="container is-max-desktop content">
