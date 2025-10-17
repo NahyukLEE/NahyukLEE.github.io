@@ -384,7 +384,7 @@ footer { width: 270px; float: left; position: fixed; bottom: 50px; -webkit-font-
 	
 	.cont-right {
 		float: none;
-		text-align: left;
+		text-align: right;
 		margin-top: 5px;
 		margin-left: 0;
 	}
