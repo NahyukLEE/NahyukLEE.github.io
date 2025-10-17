@@ -219,8 +219,8 @@ footer { width: 270px; float: left; position: fixed; bottom: 50px; -webkit-font-
   header a small { display: inline; }
   header ul { position: static; margin: 10px auto; }
   .cont-left { width: 100%; float: none; }
-  .cont-right { float: none; text-align: right; margin-top: 5px; overflow-x: hidden; }
-  .dates { font-size: 12px; }
+  .cont-right { float: none; text-align: right; margin-top: 5px; overflow-x: hidden; padding-right: 5px; }
+  .dates { font-size: 12px; padding-right: 5px; }
 }
 @media print, screen and (max-width: 720px) { 
   body { word-wrap: break-word; padding: 15px; }
@@ -250,6 +250,7 @@ footer { width: 270px; float: left; position: fixed; bottom: 50px; -webkit-font-
 	.cont-right {
 		text-align: right !important;
 		overflow-x: hidden;
+		padding-right: 5px;
 	}
 	
 	.dates {
@@ -259,6 +260,7 @@ footer { width: 270px; float: left; position: fixed; bottom: 50px; -webkit-font-
 		margin-left: 0;
 		margin-top: 5px;
 		font-size: 12px;
+		padding-right: 5px;
 	}
 }
 @media print, screen and (max-width: 360px) { 
