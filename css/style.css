@@ -249,7 +249,7 @@ footer { width: 270px; float: left; position: fixed; bottom: 50px; -webkit-font-
 	
 	.cont-right {
 		text-align: right !important;
-		padding-right: 10px;
+		padding-right: 5px;
 		box-sizing: border-box;
 	}
 	
