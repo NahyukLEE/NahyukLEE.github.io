@@ -215,12 +215,16 @@ footer { width: 270px; float: left; position: fixed; bottom: 50px; -webkit-font-
   div.wrapper { width: auto; margin: 0; }
   header, section, footer { float: none; position: static; width: auto; }
   header { padding-right: 0; text-align: center; }
-  section { border: 1px solid #e5e5e5; border-width: 1px 0; padding: 20px 10px; margin: 0 0 20px; overflow-x: hidden; }
+  header h1 { font-size: 28px; }
+  .header-links { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+  .header-links a { display: inline-block; }
+  .header-links br { display: none; }
+  section { border: 1px solid #e5e5e5; border-width: 1px 0; padding: 20px 10px; margin: 20px 0 20px; overflow-x: hidden; }
   header a small { display: inline; }
   header ul { position: static; margin: 10px auto; }
   .cont-left { width: 100%; float: none; }
-  .cont-right { float: none; text-align: right; margin-top: 5px; padding-right: 10px; box-sizing: border-box; }
-  .dates { font-size: 11px; padding-right: 10px; box-sizing: border-box; }
+  .cont-right { float: none; text-align: right; margin-top: 5px; padding-right: 0; box-sizing: border-box; }
+  .dates { font-size: 11px; padding-right: 0; box-sizing: border-box; }
 }
 @media print, screen and (max-width: 720px) { 
   body { word-wrap: break-word; padding: 15px; }
@@ -249,7 +253,7 @@ footer { width: 270px; float: left; position: fixed; bottom: 50px; -webkit-font-
 	
 	.cont-right {
 		text-align: right !important;
-		padding-right: 10px;
+		padding-right: 0;
 		box-sizing: border-box;
 	}
 	
@@ -260,7 +264,7 @@ footer { width: 270px; float: left; position: fixed; bottom: 50px; -webkit-font-
 		margin-left: 0;
 		margin-top: 5px;
 		font-size: 11px;
-		padding-right: 10px;
+		padding-right: 0;
 		box-sizing: border-box;
 	}
 }
