@@ -295,6 +295,8 @@ footer { width: 270px; float: left; position: fixed; bottom: 50px; -webkit-font-
 	border-radius: 0;
 	background-color: transparent;
 	transition: box-shadow 0.3s ease;
+	clear: both;
+	overflow: hidden;
 }
 
 .publication-card:hover {
@@ -310,6 +312,7 @@ footer { width: 270px; float: left; position: fixed; bottom: 50px; -webkit-font-
 	overflow: hidden;
 	background-color: #fff;
 	border: none;
+	float: left;
 }
 
 .publication-image img {
@@ -321,6 +324,7 @@ footer { width: 270px; float: left; position: fixed; bottom: 50px; -webkit-font-
 .publication-content {
 	flex: 1;
 	min-width: 0;
+	overflow: hidden;
 }
 
 .publication-title {
@@ -369,6 +373,7 @@ footer { width: 270px; float: left; position: fixed; bottom: 50px; -webkit-font-
 	.publication-card {
 		flex-direction: column;
 		padding: 15px;
+		display: block;
 	}
 	
 	.publication-image {
@@ -376,5 +381,6 @@ footer { width: 270px; float: left; position: fixed; bottom: 50px; -webkit-font-
 		height: 150px;
 		margin-right: 0;
 		margin-bottom: 15px;
+		float: none;
 	}
 }
