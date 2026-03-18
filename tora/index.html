@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="TORA: Topological Representation Alignment for 3D Shape Assembly">
+  <meta name="keywords" content="3D shape assembly, point cloud, flow matching, representation alignment, knowledge distillation">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TORA: Topological Representation Alignment for 3D Shape Assembly</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'><text y='24' font-size='24'>🔗</text></svg>">
+
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://esm.sh/three@0.162.0",
+      "three/addons/": "https://esm.sh/three@0.162.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [["\\(","\\)"], ["$","$"]] },
+      svg: { fontCache: "global" }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+<body>
+
+<!-- ============ HERO ============ -->
+<section class="hero-section">
+  <div class="container">
+    <h1 class="publication-title">
+      <span class="highlight">TORA</span>: Topological Representation Alignment<br>for 3D Shape Assembly
+    </h1>
+
+    <div class="authors-list">
+      <div class="authors-names">
+        <span class="author-name"><a href="https://nahyuklee.github.io/" target="_blank">Nahyuk Lee</a>*</span>
+        <span class="author-name">Zhiang Chen*</span>
+        <span class="author-name"><a href="https://cvg.ethz.ch/team/Prof-Dr-Marc-Pollefeys" target="_blank">Marc Pollefeys</a></span>
+        <span class="author-name"><a href="https://sunghwanhong.github.io/" target="_blank">Sunghwan Hong</a></span>
+      </div>
+      <div class="authors-affiliation">ETH Zurich</div>
+      <div class="authors-note">*Equal contribution</div>
+    </div>
+
+    <div class="link-buttons">
+      <a href="#" class="link-btn primary">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+        arXiv
+      </a>
+      <a href="#" class="link-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        Code
+      </a>
+      <a href="#" class="link-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-2.5-6.5c0 .83-.67 1.5-1.5 1.5S7 14.33 7 13.5 7.67 12 8.5 12s1.5.67 1.5 1.5zm5 0c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5zm-2.5 3c-1.66 0-3 1.34-3 3h6c0-1.66-1.34-3-3-3z"/></svg>
+        Hugging Face
+      </a>
+    </div>
+
+    <div class="tldr-card">
+      <strong>TL;DR:</strong> A topology-first teacher–student framework that distills relational geometric structure
+      from a frozen 3D encoder into a flow-matching model, achieving <strong>state-of-the-art 3D shape assembly</strong>
+      with zero inference overhead.
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ KEY FINDINGS & Abstract ============ -->
+<section class="content-section" style="background: var(--bg-white);">
+  <div class="container">
+    <h2 class="section-title">Abstract</h2>
+    <p class="abstract-text">
+      
+      Flow-matching methods for 3D shape assembly learn point-wise velocity fields that transport parts
+      toward assembled configurations, yet they receive no explicit guidance about which cross-part interactions
+      should drive the motion. We introduce <span class="method-name">TORA</span>, a topology-first representation
+      alignment framework that distills relational structure from a frozen pretrained 3D encoder into the
+      flow-matching backbone during training. We first realize this via simple instantiation, token-wise cosine
+      matching, which injects the learned geometric descriptors from the teacher representation. We then extend
+      to employ a <strong>Centered Kernel Alignment (CKA)</strong> loss to match the similarity structure between
+      student and teacher representations for enhanced topological alignment.
+      Through systematic probing of diverse 3D encoders, we show that geometry- and contact-centric teacher
+      properties, not semantic classification ability, govern alignment effectiveness, and that alignment is most
+      beneficial at later transformer layers where spatial structure naturally emerges.
+      <span class="method-name">TORA</span> introduces <strong>zero inference overhead</strong> while yielding two
+      consistent benefits: faster convergence (up to <strong>5.9×</strong>) and improved accuracy in-distribution,
+      along with greater robustness under domain shift. Experiments on five benchmarks spanning geometric,
+      semantic, and inter-object assembly demonstrate state-of-the-art performance, with particularly pronounced
+      gains in zero-shot transfer to unseen real-world and synthetic datasets.
+    </p>
+    <div class="findings-grid">
+      <div class="finding-card">
+        <div class="metric">5.9×</div>
+        <div class="metric-label">Faster Convergence</div>
+        <div class="metric-desc">TORA reaches baseline peak performance up to 5.9× faster on Breaking Bad, significantly reducing training cost.</div>
+      </div>
+      <div class="finding-card">
+        <div class="metric">95.7%</div>
+        <div class="metric-label">Part Accuracy</div>
+        <div class="metric-desc">State-of-the-art assembly accuracy on the Breaking Bad benchmark, improving over RPF baseline (93.2%).</div>
+      </div>
+      <div class="finding-card">
+        <div class="metric">0</div>
+        <div class="metric-label">Inference Overhead</div>
+        <div class="metric-desc">The teacher encoder is only used during training. At test time, TORA adds strictly zero computational overhead.</div>
+      </div>
+      <div class="finding-card">
+        <div class="metric">94.4%</div>
+        <div class="metric-label">Zero-shot Transfer</div>
+        <div class="metric-desc">Strong generalization to unseen datasets (Breaking Bad Artifact), demonstrating robust domain transfer.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TORA vs. RPF ============ -->
+<section class="content-section" style="background: var(--bg-light);">
+  <div class="container wide">
+    <h2 class="section-title">Consistent Gains Across Diverse Assembly Settings</h2>
+    <p class="section-subtitle">TORA outperforms RPF in every setting—geometric, semantic, and inter-object. Higher Part Accuracy ↑ is better; lower Rotation Error ↓ and Translation Error ↓ are better.</p>
+
+    <div class="rpf-comparison-grid dataset-tabs" id="dataset-tabs">
+      <div class="rpf-comparison-card dataset-tab active" data-dataset="geometric" role="button" tabindex="0">
+        <div class="rpf-comparison-card-title"><span class="card-kw">Geometric</span> assembly</div>
+        <div class="rpf-comparison-card-sub">Breaking Bad benchmark</div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Part Accuracy ↑</span>
+          <div class="comparison-row">
+            <span class="comparison-label">RPF</span>
+            <div class="comparison-bar-wrap"><div class="comparison-bar rpf" style="width: 31.4%;"></div></div>
+            <span class="comparison-val">93.2%</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap"><div class="comparison-bar tora" style="width: 67.1%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">95.7%</span>
+              <span class="comparison-improve">+2.5%</span>
+            </div>
+          </div>
+        </div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Rotation Error ↓</span>
+          <div class="comparison-row">
+            <span class="comparison-label">RPF</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar rpf" style="width: 81.8%;"></div></div>
+            <span class="comparison-val">16.0°</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar tora" style="width: 14.5%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">8.6°</span>
+              <span class="comparison-improve">46% ↓</span>
+            </div>
+          </div>
+        </div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Translation Error ↓</span>
+          <div class="comparison-row">
+            <span class="comparison-label">RPF</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar rpf" style="width: 80%;"></div></div>
+            <span class="comparison-val">4.3 cm</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar tora" style="width: 17.1%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">2.1 cm</span>
+              <span class="comparison-improve">51% ↓</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rpf-comparison-card dataset-tab" data-dataset="many-part" role="button" tabindex="0">
+        <div class="rpf-comparison-card-title"><span class="card-kw">Many-part</span> geometric</div>
+        <div class="rpf-comparison-card-sub">Breaking Bad with [21, 33] parts</div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Part Accuracy ↑</span>
+          <div class="comparison-row">
+            <span class="comparison-label">RPF</span>
+            <div class="comparison-bar-wrap"><div class="comparison-bar rpf" style="width: 15%;"></div></div>
+            <span class="comparison-val">62.1%</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap"><div class="comparison-bar tora" style="width: 83.6%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">71.7%</span>
+              <span class="comparison-improve">+9.6%</span>
+            </div>
+          </div>
+        </div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Rotation Error ↓</span>
+          <div class="comparison-row">
+            <span class="comparison-label">RPF</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar rpf" style="width: 84.7%;"></div></div>
+            <span class="comparison-val">77.3°</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar tora" style="width: 15.6%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">64.8°</span>
+              <span class="comparison-improve">16% ↓</span>
+            </div>
+          </div>
+        </div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Translation Error ↓</span>
+          <div class="comparison-row">
+            <span class="comparison-label">RPF</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar rpf" style="width: 70%;"></div></div>
+            <span class="comparison-val">15.2 cm</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar tora" style="width: 25%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">12.5 cm</span>
+              <span class="comparison-improve">18% ↓</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rpf-comparison-card dataset-tab" data-dataset="semantic" role="button" tabindex="0">
+        <div class="rpf-comparison-card-title"><span class="card-kw">Semantic</span> assembly</div>
+        <div class="rpf-comparison-card-sub">PartNet-Assembly benchmark</div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Part Accuracy ↑</span>
+          <div class="comparison-row">
+            <span class="comparison-label">RPF</span>
+            <div class="comparison-bar-wrap"><div class="comparison-bar rpf" style="width: 18.7%;"></div></div>
+            <span class="comparison-val">59.8%</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap"><div class="comparison-bar tora" style="width: 80.7%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">69.1%</span>
+              <span class="comparison-improve">+9.3%</span>
+            </div>
+          </div>
+        </div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Rotation Error ↓</span>
+          <div class="comparison-row">
+            <span class="comparison-label">RPF</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar rpf" style="width: 74.5%;"></div></div>
+            <span class="comparison-val">46.2°</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar tora" style="width: 25.5%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">40.8°</span>
+              <span class="comparison-improve">12% ↓</span>
+            </div>
+          </div>
+        </div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Translation Error ↓</span>
+          <div class="comparison-row">
+            <span class="comparison-label">RPF</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar rpf" style="width: 75%;"></div></div>
+            <span class="comparison-val">21.5 cm</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar tora" style="width: 30%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">18.8 cm</span>
+              <span class="comparison-improve">13% ↓</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rpf-comparison-card dataset-tab" data-dataset="inter-object" role="button" tabindex="0">
+        <div class="rpf-comparison-card-title"><span class="card-kw">Inter-object</span> assembly</div>
+        <div class="rpf-comparison-card-sub">TwoByTwo benchmark</div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Part Accuracy ↑</span>
+          <div class="comparison-row">
+            <span class="comparison-label">RPF</span>
+            <div class="comparison-bar-wrap"><div class="comparison-bar rpf" style="width: 21.8%;"></div></div>
+            <span class="comparison-val">65.4%</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap"><div class="comparison-bar tora" style="width: 77.3%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">71.5%</span>
+              <span class="comparison-improve">+6.1%</span>
+            </div>
+          </div>
+        </div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Rotation Error ↓</span>
+          <div class="comparison-row">
+            <span class="comparison-label">RPF</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar rpf" style="width: 78%;"></div></div>
+            <span class="comparison-val">15.8°</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar tora" style="width: 20%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">10.0°</span>
+              <span class="comparison-improve">37% ↓</span>
+            </div>
+          </div>
+        </div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Translation Error ↓</span>
+          <div class="comparison-row">
+            <span class="comparison-label">RPF</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar rpf" style="width: 84.3%;"></div></div>
+            <span class="comparison-val">11.9 cm</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar tora" style="width: 22.9%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">7.6 cm</span>
+              <span class="comparison-improve">36% ↓</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dataset-example-panels">
+      <div class="comparison-grid" id="dataset-comparison-grid">
+        <div>
+          <div class="comparison-col-label">Input</div>
+          <div class="comparison-viewer" id="comp-dataset-input"></div>
+        </div>
+        <div>
+          <div class="comparison-col-label">RPF</div>
+          <div class="comparison-viewer" id="comp-dataset-rpf"></div>
+        </div>
+        <div>
+          <div class="comparison-col-label">Ours</div>
+          <div class="comparison-viewer" id="comp-dataset-ours"></div>
+        </div>
+        <div>
+          <div class="comparison-col-label">GT</div>
+          <div class="comparison-viewer" id="comp-dataset-gt"></div>
+        </div>
+      </div>
+      <div class="sample-buttons" id="dataset-sample-buttons">
+        <button type="button" class="sample-btn active" data-sample="0">1</button>
+        <button type="button" class="sample-btn" data-sample="1">2</button>
+        <button type="button" class="sample-btn" data-sample="2">3</button>
+        <button type="button" class="sample-btn" data-sample="3">4</button>
+        <button type="button" class="sample-btn" data-sample="4">5</button>
+        <button type="button" class="sample-btn" data-sample="5">6</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ INTERACTIVE SLIDER ============ -->
+<section class="content-section">
+  <div class="container">
+    <h2 class="section-title">Assembly Flow Visualization</h2>
+    <p class="section-subtitle">Drag the slider to control the flow from noise (disassembled) to assembled state.</p>
+
+    <div class="assembly-animation-container" id="slider-viewer" style="height: 380px;"></div>
+
+    <div class="slider-container">
+      <label>Disassembled</label>
+      <input type="range" id="assembly-slider" min="0" max="1" step="0.01" value="0">
+      <label>Assembled</label>
+      <span class="slider-val" id="slider-value">0.00</span>
+    </div>
+
+    <div class="category-buttons">
+      <button class="cat-btn active" onclick="switchSliderShape('chair', this)">Chair</button>
+      <button class="cat-btn" onclick="switchSliderShape('table', this)">Table</button>
+      <button class="cat-btn" onclick="switchSliderShape('vase', this)">Vase</button>
+      <button class="cat-btn" onclick="switchSliderShape('bowl', this)">Bowl</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONVERGENCE ============ -->
+<section class="content-section">
+  <div class="container">
+    <h2 class="section-title">Convergence Analysis</h2>
+    <p class="section-subtitle">
+      TORA consistently accelerates optimization, reaching the RPF baseline's peak performance up to 5.9× faster.
+    </p>
+
+    <div class="findings-grid" style="grid-template-columns: repeat(3, 1fr);">
+      <div class="finding-card" style="text-align: center;">
+        <div class="metric">5.9×</div>
+        <div class="metric-label">Breaking Bad</div>
+        <div class="metric-desc">Fastest convergence speedup, reaching higher final accuracy.</div>
+      </div>
+      <div class="finding-card" style="text-align: center;">
+        <div class="metric">3.3×</div>
+        <div class="metric-label">PartNet-Assembly</div>
+        <div class="metric-desc">Consistent acceleration over cosine (2.2×) and NT-Xent (1.8×).</div>
+      </div>
+      <div class="finding-card" style="text-align: center;">
+        <div class="metric">+6.1%</div>
+        <div class="metric-label">TwoByTwo</div>
+        <div class="metric-desc">Most pronounced gains under distribution shift with improved final accuracy.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TEACHER ANALYSIS ============ -->
+<section class="content-section" style="background: var(--bg-white);">
+  <div class="container">
+    <h2 class="section-title">What Makes a Good Teacher?</h2>
+    <p class="section-subtitle">
+      Geometry- and contact-centric properties predict assembly transfer, not semantic classification ability.
+    </p>
+
+    <div class="findings-grid" style="grid-template-columns: repeat(2, 1fr);">
+      <div class="finding-card">
+        <div class="metric" style="font-size: 1.4rem;">r = −0.04</div>
+        <div class="metric-label">Classification Accuracy ↔ Assembly</div>
+        <div class="metric-desc">Near-zero correlation: global semantic understanding does NOT predict assembly quality.</div>
+      </div>
+      <div class="finding-card">
+        <div class="metric" style="font-size: 1.4rem;">r = 0.94</div>
+        <div class="metric-label">Segmentation F1 ↔ Assembly</div>
+        <div class="metric-desc">Strongest correlation: mating-surface segmentation is highly predictive of downstream gains.</div>
+      </div>
+    </div>
+
+    <p style="text-align: center; margin-top: 20px; font-size: 0.92rem; color: var(--text-body); max-width: 700px; margin-left: auto; margin-right: auto;">
+      We adopt <strong>Uni3D</strong> as the default teacher, as it consistently achieves the strongest geometry/contact
+      probe performance and yields the best downstream assembly accuracy across all alignment objectives.
+    </p>
+  </div>
+</section>
+
+<!-- ============ BIBTEX ============ -->
+<section class="content-section">
+  <div class="container">
+    <h2 class="section-title">BibTeX</h2>
+    <div class="bibtex-wrapper">
+      <button class="copy-btn" onclick="copyBibtex()">
+        <i class="fas fa-copy"></i> Copy
+      </button>
+      <pre class="bibtex-code" id="bibtex-text">@inproceedings{anonymous2026tora,
+  title     = {TORA: Topological Representation Alignment
+               for 3D Shape Assembly},
+  author    = {Lee, Nahyuk and Chen, Zhiang and Pollefeys, Marc and Hong, Sunghwan},
+  year      = {2026}
+}</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer-section">
+  <div class="container">
+    <p>
+      This website template is inspired by
+      <a href="https://rectified-pointflow.github.io/" target="_blank">Rectified Point Flow</a> and
+      <a href="https://ai4ce.github.io/GARF/" target="_blank">GARF</a>.
+      The point cloud visualizations are rendered with <a href="https://threejs.org/" target="_blank">Three.js</a>.
+    </p>
+  </div>
+</footer>
+
+<!-- ============ SCRIPTS ============ -->
+<script type="module">
+  import {
+    initAssemblyViewer,
+    initComparisonViewers,
+    initSliderViewer
+  } from './js/point-cloud-viewer.js';
+
+  let teaserViewer = null;
+  let sliderViewer = null;
+
+  window.addEventListener('DOMContentLoaded', () => {
+    teaserViewer = initAssemblyViewer('teaser-viewer', 'chair');
+
+    initComparisonViewers(
+      ['comp-input', 'comp-rpf', 'comp-ours', 'comp-gt'],
+      'chair'
+    );
+
+    const datasetShapeMap = { geometric: 'chair', 'many-part': 'table', semantic: 'vase', 'inter-object': 'bowl' };
+    const datasetComparisonViewers = initComparisonViewers(
+      ['comp-dataset-input', 'comp-dataset-rpf', 'comp-dataset-ours', 'comp-dataset-gt'],
+      'chair'
+    );
+
+    sliderViewer = initSliderViewer(
+      'slider-viewer', 'assembly-slider', 'slider-value', 'chair'
+    );
+
+    const datasetTabsEl = document.getElementById('dataset-tabs');
+    const sampleBtnsEl = document.getElementById('dataset-sample-buttons');
+    if (datasetTabsEl && datasetComparisonViewers) {
+      datasetTabsEl.addEventListener('click', (e) => {
+        const tab = e.target.closest('.dataset-tab');
+        if (!tab) return;
+        const dataset = tab.getAttribute('data-dataset');
+        if (!dataset) return;
+        document.querySelectorAll('.dataset-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const shapeName = datasetShapeMap[dataset] || 'chair';
+        datasetComparisonViewers.setShape(shapeName);
+        if (sampleBtnsEl) {
+          sampleBtnsEl.querySelectorAll('.sample-btn').forEach((btn, i) => {
+            btn.classList.toggle('active', i === 0);
+          });
+        }
+      });
+      datasetTabsEl.addEventListener('keydown', (e) => {
+        const tab = e.target.closest('.dataset-tab');
+        if (!tab || (e.key !== 'Enter' && e.key !== ' ')) return;
+        e.preventDefault();
+        tab.click();
+      });
+    }
+    if (sampleBtnsEl && datasetComparisonViewers) {
+      sampleBtnsEl.addEventListener('click', (e) => {
+        const btn = e.target.closest('.sample-btn');
+        if (!btn) return;
+        const index = parseInt(btn.getAttribute('data-sample'), 10);
+        if (isNaN(index) || index < 0 || index > 5) return;
+        datasetComparisonViewers.setSample(index);
+        sampleBtnsEl.querySelectorAll('.sample-btn').forEach((b, i) => b.classList.toggle('active', i === index));
+      });
+    }
+  });
+
+  window.switchTeaserShape = function(shape, btn) {
+    document.querySelectorAll('.category-buttons .cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (teaserViewer) teaserViewer.setShape(shape);
+  };
+
+  window.switchSliderShape = function(shape, btn) {
+    const parent = btn.parentElement;
+    parent.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (sliderViewer) sliderViewer.setShape(shape);
+  };
+
+</script>
+
+<script>
+  function copyBibtex() {
+    const text = document.getElementById('bibtex-text').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+      setTimeout(() => {
+        btn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+      }, 2000);
+    });
+  }
+</script>
+
+</body>
+</html>
