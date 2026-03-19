@@ -426,13 +426,13 @@
         </button>
       </div>
       <div class="convergence-chart-wrapper">
-        <div class="convergence-top-row">
-          <div class="convergence-ema-control">
+        <div class="convergence-top-row" style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:12px;">
+          <div class="convergence-ema-control" style="display:flex;align-items:center;gap:12px;">
             <label for="convergence-ema-slider" class="convergence-ema-label">EMA smoothing</label>
             <input type="range" id="convergence-ema-slider" class="convergence-ema-slider" min="0" max="50" value="0" step="1">
             <span class="convergence-ema-value" id="convergence-ema-value">off</span>
           </div>
-          <div class="convergence-legend-custom" id="convergence-legend-custom" aria-hidden="true"></div>
+          <div class="convergence-legend-custom" id="convergence-legend-custom" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:0.8rem;" aria-hidden="true"></div>
         </div>
         <div class="convergence-chart-container">
           <canvas id="convergence-chart" aria-label="PA vs Epoch"></canvas>
@@ -672,7 +672,7 @@
       data: series[key],
       borderColor: isRaw ? CONV_BORDER_RAW[key] : CONV_BORDER[key],
       backgroundColor: isRaw ? CONV_BORDER_RAW[key] : CONV_COLORS[key],
-      borderWidth: isRaw ? 1.5 : 2,
+      borderWidth: isRaw ? 1.5 : (key === 'CKA' ? 2.5 : 2),
       fill: false,
       tension: 0.35,
       pointRadius: 0,
@@ -697,8 +697,8 @@
       const withLabel = convergenceChart.data.datasets.filter(d => d.label != null && d.label !== '');
       const byOrder = [...withLabel].sort((a, b) => (a.order || 0) - (b.order || 0));
       legendEl.innerHTML = byOrder.map(d => {
-        const color = d.borderColor || d.backgroundColor || '#999';
-        return '<span class="convergence-legend-item"><i style="background:' + color + '"></i><span>' + escapeHtml(d.label) + '</span></span>';
+        const color = (d.borderColor || d.backgroundColor || '#999').replace(/"/g, '&quot;');
+        return '<span style="display:inline-flex;align-items:center;gap:6px;margin-right:16px;"><span style="display:inline-block;width:14px;height:3px;border-radius:2px;background:' + color + ';flex-shrink:0;"></span><span>' + escapeHtml(d.label) + '</span></span>';
       }).join('');
     }
     function escapeHtml(s) {
