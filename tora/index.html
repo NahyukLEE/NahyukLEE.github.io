@@ -28,6 +28,7 @@
     };
   </script>
   <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 
 <body>
@@ -92,16 +93,16 @@
       properties, not semantic classification ability, govern alignment effectiveness, and that alignment is most
       beneficial at later transformer layers where spatial structure naturally emerges.
       <span class="method-name">TORA</span> introduces <strong>zero inference overhead</strong> while yielding two
-      consistent benefits: faster convergence (up to <strong>5.9×</strong>) and improved accuracy in-distribution,
+      consistent benefits: faster convergence (up to <strong>6.9×</strong>) and improved accuracy in-distribution,
       along with greater robustness under domain shift. Experiments on five benchmarks spanning geometric,
       semantic, and inter-object assembly demonstrate state-of-the-art performance, with particularly pronounced
       gains in zero-shot transfer to unseen real-world and synthetic datasets.
     </p>
     <div class="findings-grid">
       <div class="finding-card">
-        <div class="metric">5.9×</div>
+        <div class="metric">6.9×</div>
         <div class="metric-label">Faster Convergence</div>
-        <div class="metric-desc">TORA reaches baseline peak performance up to 5.9× faster on Breaking Bad, significantly reducing training cost.</div>
+        <div class="metric-desc">TORA reaches baseline peak performance up to 6.9× faster on Breaking Bad, significantly reducing training cost.</div>
       </div>
       <div class="finding-card">
         <div class="metric">95.7%</div>
@@ -375,7 +376,7 @@
 
 
 <!-- ============ INTERACTIVE SLIDER ============ -->
-<section class="content-section">
+<!-- <section class="content-section">
   <div class="container">
     <h2 class="section-title">Assembly Flow Visualization</h2>
     <p class="section-subtitle">Drag the slider to control the flow from noise (disassembled) to assembled state.</p>
@@ -396,31 +397,47 @@
       <button class="cat-btn" onclick="switchSliderShape('bowl', this)">Bowl</button>
     </div>
   </div>
-</section>
+</section> -->
 
 <!-- ============ CONVERGENCE ============ -->
 <section class="content-section">
   <div class="container">
     <h2 class="section-title">Convergence Analysis</h2>
     <p class="section-subtitle">
-      TORA consistently accelerates optimization, reaching the RPF baseline's peak performance up to 5.9× faster.
+      TORA consistently accelerates optimization, reaching the RPF baseline's peak performance up to 6.9× faster.
     </p>
 
-    <div class="findings-grid" style="grid-template-columns: repeat(3, 1fr);">
-      <div class="finding-card" style="text-align: center;">
-        <div class="metric">5.9×</div>
-        <div class="metric-label">Breaking Bad</div>
-        <div class="metric-desc">Fastest convergence speedup, reaching higher final accuracy.</div>
+    <div class="convergence-layout">
+      <div class="convergence-buttons" id="convergence-dataset-tabs" role="group" aria-label="Select dataset">
+        <button type="button" class="conv-tab conv-card active" data-csv="csv/pa_epoch_bbad.csv" data-label="Breaking Bad">
+          <span class="conv-card-metric">6.9×</span>
+          <span class="conv-card-label">Geometric assembly</span>
+          <span class="conv-card-dataset">Breaking Bad</span>
+        </button>
+        <button type="button" class="conv-tab conv-card" data-csv="csv/pa_epoch_partnet.csv" data-label="PartNet-Assembly">
+          <span class="conv-card-metric">3.3×</span>
+          <span class="conv-card-label">Semantic assembly</span>
+          <span class="conv-card-dataset">PartNet-Assembly</span>
+        </button>
+        <button type="button" class="conv-tab conv-card" data-csv="csv/pa_epoch_2by2.csv" data-label="TwoByTwo">
+          <span class="conv-card-metric">1.6×</span>
+          <span class="conv-card-label">Inter-object assembly</span>
+          <span class="conv-card-dataset">TwoByTwo</span>
+        </button>
       </div>
-      <div class="finding-card" style="text-align: center;">
-        <div class="metric">3.3×</div>
-        <div class="metric-label">PartNet-Assembly</div>
-        <div class="metric-desc">Consistent acceleration over cosine (2.2×) and NT-Xent (1.8×).</div>
-      </div>
-      <div class="finding-card" style="text-align: center;">
-        <div class="metric">+6.1%</div>
-        <div class="metric-label">TwoByTwo</div>
-        <div class="metric-desc">Most pronounced gains under distribution shift with improved final accuracy.</div>
+      <div class="convergence-chart-wrapper">
+        <div class="convergence-top-row">
+          <div class="convergence-ema-control">
+            <label for="convergence-ema-slider" class="convergence-ema-label">EMA smoothing</label>
+            <input type="range" id="convergence-ema-slider" class="convergence-ema-slider" min="0" max="50" value="0" step="1">
+            <span class="convergence-ema-value" id="convergence-ema-value">off</span>
+          </div>
+          <div class="convergence-legend-custom" id="convergence-legend-custom" aria-hidden="true"></div>
+        </div>
+        <div class="convergence-chart-container">
+          <canvas id="convergence-chart" aria-label="PA vs Epoch"></canvas>
+        </div>
+        <p class="convergence-chart-caption">Part Accuracy (PA) vs training epoch. Ours (CKA / Cos-dist / NT-Xent) are TORA variants; RPF is baseline.</p>
       </div>
     </div>
   </div>
@@ -576,6 +593,217 @@
       }, 2000);
     });
   }
+</script>
+
+<script>
+(function() {
+  const CONV_COLORS = {
+    RPF_base: 'rgba(120, 120, 120, 0.9)',
+    CKA:      'rgba(74, 108, 247, 0.9)',
+    'NT-Xent': 'rgba(124, 58, 237, 0.9)',
+    Cos:      'rgba(34, 197, 94, 0.9)'
+  };
+  const CONV_BORDER = {
+    RPF_base: 'rgb(80, 80, 80)',
+    CKA:      'rgb(74, 108, 247)',
+    'NT-Xent': 'rgb(124, 58, 237)',
+    Cos:      'rgb(34, 197, 94)'
+  };
+  const CONV_BORDER_RAW = {
+    RPF_base: 'rgba(80, 80, 80, 0.35)',
+    CKA:      'rgba(74, 108, 247, 0.35)',
+    'NT-Xent': 'rgba(124, 58, 237, 0.35)',
+    Cos:      'rgba(34, 197, 94, 0.35)'
+  };
+  const METRIC_KEYS = ['RPF_base', 'NT-Xent', 'Cos', 'CKA'];
+  const METRIC_LABELS = { RPF_base: 'RPF', CKA: 'Ours (CKA)', 'NT-Xent': 'Ours (NT-Xent)', Cos: 'Ours (Cos-dist)' };
+  const CONV_ORDER = { RPF_base: 4, 'NT-Xent': 3, Cos: 2, CKA: 1 };
+
+  function parseCSV(text) {
+    const lines = text.trim().split('\n');
+    if (lines.length < 2) return { epochs: [], series: {} };
+    const headers = lines[0].split(',').map(h => h.trim());
+    const epochs = [];
+    const series = {};
+    METRIC_KEYS.forEach(k => { series[k] = []; });
+    for (let i = 1; i < lines.length; i++) {
+      const row = lines[i].split(',');
+      const epoch = parseInt(row[0], 10);
+      if (isNaN(epoch)) continue;
+      epochs.push(epoch);
+      METRIC_KEYS.forEach((k, j) => {
+        const idx = headers.indexOf(k);
+        const val = idx >= 0 ? parseFloat(row[idx]) : NaN;
+        series[k].push(isNaN(val) ? null : val);
+      });
+    }
+    return { epochs, series };
+  }
+
+  function applyEMA(series, span) {
+    if (!span || span < 1) return series;
+    const alpha = 2 / (span + 1);
+    const out = {};
+    METRIC_KEYS.forEach(key => {
+      const arr = series[key];
+      const smoothed = [];
+      for (let i = 0; i < arr.length; i++) {
+        const v = arr[i];
+        if (v == null || Number.isNaN(v)) {
+          smoothed.push(null);
+          continue;
+        }
+        if (i === 0) {
+          smoothed.push(v);
+        } else {
+          const prev = smoothed[i - 1];
+          smoothed.push(prev == null ? v : alpha * v + (1 - alpha) * prev);
+        }
+      }
+      out[key] = smoothed;
+    });
+    return out;
+  }
+
+  function buildDatasets(epochs, series, opts) {
+    const isRaw = opts && opts.isRaw;
+    return METRIC_KEYS.map(key => ({
+      label: isRaw ? null : (METRIC_LABELS[key] || key),
+      data: series[key],
+      borderColor: isRaw ? CONV_BORDER_RAW[key] : CONV_BORDER[key],
+      backgroundColor: isRaw ? CONV_BORDER_RAW[key] : CONV_COLORS[key],
+      borderWidth: isRaw ? 1.5 : 2,
+      fill: false,
+      tension: 0.35,
+      pointRadius: 0,
+      pointHoverRadius: isRaw ? 0 : 6,
+      order: isRaw ? 0 : (CONV_ORDER[key] != null ? CONV_ORDER[key] : 1)
+    }));
+  }
+
+  let convergenceChart = null;
+  let lastRaw = { epochs: [], series: {} };
+
+  function initConvergenceChart() {
+    const canvas = document.getElementById('convergence-chart');
+    const tabsEl = document.getElementById('convergence-dataset-tabs');
+    const emaSlider = document.getElementById('convergence-ema-slider');
+    const emaValueEl = document.getElementById('convergence-ema-value');
+    const legendEl = document.getElementById('convergence-legend-custom');
+    if (!canvas || !tabsEl || typeof Chart === 'undefined') return;
+
+    function syncCustomLegend() {
+      if (!legendEl || !convergenceChart || !convergenceChart.data.datasets) return;
+      const withLabel = convergenceChart.data.datasets.filter(d => d.label != null && d.label !== '');
+      const byOrder = [...withLabel].sort((a, b) => (a.order || 0) - (b.order || 0));
+      legendEl.innerHTML = byOrder.map(d => {
+        const color = d.borderColor || d.backgroundColor || '#999';
+        return '<span class="convergence-legend-item"><i style="background:' + color + '"></i><span>' + escapeHtml(d.label) + '</span></span>';
+      }).join('');
+    }
+    function escapeHtml(s) {
+      const div = document.createElement('div');
+      div.textContent = s;
+      return div.innerHTML;
+    }
+
+    const firstTab = tabsEl.querySelector('.conv-tab[data-csv]');
+    const firstCsv = firstTab ? firstTab.getAttribute('data-csv') : 'csv/pa_epoch_bbad.csv';
+
+    function renderChart() {
+      const span = emaSlider ? parseInt(emaSlider.value, 10) || 0 : 0;
+      let datasets;
+      if (span > 0) {
+        const smoothed = applyEMA(lastRaw.series, span);
+        const rawSets = buildDatasets(lastRaw.epochs, lastRaw.series, { isRaw: true });
+        const smoothSets = buildDatasets(lastRaw.epochs, smoothed, { isRaw: false });
+        datasets = rawSets.concat(smoothSets);
+      } else {
+        datasets = buildDatasets(lastRaw.epochs, lastRaw.series);
+      }
+      if (emaValueEl) emaValueEl.textContent = span === 0 ? 'off' : String(span);
+      if (!convergenceChart) return;
+      convergenceChart.data.labels = lastRaw.epochs;
+      convergenceChart.data.datasets = datasets;
+      convergenceChart.update('none');
+      syncCustomLegend();
+    }
+
+    function updateChart(csvPath) {
+      fetch(csvPath)
+        .then(r => r.text())
+        .then(text => {
+          const parsed = parseCSV(text);
+          lastRaw = { epochs: parsed.epochs, series: parsed.series };
+          if (!convergenceChart) {
+            const span = emaSlider ? parseInt(emaSlider.value, 10) || 0 : 0;
+            const series = span > 0 ? applyEMA(lastRaw.series, span) : lastRaw.series;
+            const datasets = buildDatasets(lastRaw.epochs, series);
+            convergenceChart = new Chart(canvas, {
+              type: 'line',
+              data: { labels: lastRaw.epochs, datasets },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { intersect: false, mode: 'index' },
+                plugins: {
+                  legend: { display: false }
+                },
+                scales: {
+                  x: {
+                    title: { display: true, text: 'Epoch' },
+                    grid: { display: true, color: 'rgba(0,0,0,0.06)' }
+                  },
+                  y: {
+                    title: { display: true, text: 'Part Accuracy (PA)' },
+                    grid: { color: 'rgba(0,0,0,0.06)' }
+                  }
+                }
+              }
+            });
+          }
+          renderChart();
+        })
+        .catch(() => {
+          lastRaw = { epochs: [], series: {} };
+          if (convergenceChart) {
+            convergenceChart.data.datasets.forEach(d => { d.data = []; });
+            convergenceChart.data.labels = [];
+            convergenceChart.update('none');
+          }
+        });
+    }
+
+    if (emaSlider && emaValueEl) {
+      emaSlider.addEventListener('input', renderChart);
+      emaSlider.addEventListener('change', renderChart);
+    }
+
+    tabsEl.addEventListener('click', function(e) {
+      const tab = e.target.closest('.conv-tab');
+      if (!tab) return;
+      const csv = tab.getAttribute('data-csv');
+      if (!csv) return;
+      tabsEl.querySelectorAll('.conv-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      updateChart(csv);
+    });
+    tabsEl.addEventListener('keydown', function(e) {
+      const tab = e.target.closest('.conv-tab');
+      if (!tab || (e.key !== 'Enter' && e.key !== ' ')) return;
+      e.preventDefault();
+      tab.click();
+    });
+
+    updateChart(firstCsv);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initConvergenceChart);
+  } else {
+    initConvergenceChart();
+  }
+})();
 </script>
 
 </body>
