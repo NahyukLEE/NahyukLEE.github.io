@@ -585,6 +585,212 @@ body {
   color: #fff;
 }
 
+/* Convergence: left buttons + right chart */
+.convergence-layout {
+  display: flex;
+  gap: 24px;
+  align-items: stretch;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.convergence-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 220px;
+  width: 220px;
+}
+
+.conv-tab {
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-light);
+  color: var(--text-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.conv-tab.conv-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 16px 20px;
+  width: 100%;
+  font-weight: 400;
+  border-radius: var(--radius);
+  background: var(--bg-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.conv-card .conv-card-metric {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.conv-card .conv-card-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.conv-card .conv-card-dataset {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  display: block;
+}
+
+.conv-tab.conv-card:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+  color: var(--text-body);
+}
+
+.conv-tab.conv-card.active {
+  background: linear-gradient(135deg, rgba(74, 108, 247, 0.08) 0%, rgba(74, 108, 247, 0.04) 100%);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(74, 108, 247, 0.2);
+  color: var(--text-body);
+}
+
+.conv-tab.conv-card.active .conv-card-metric {
+  color: var(--primary);
+}
+
+.convergence-chart-wrapper {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+}
+
+.convergence-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.convergence-ema-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.convergence-legend-custom {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: var(--text-body);
+}
+
+.convergence-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.convergence-legend-item i {
+  display: inline-block;
+  width: 12px;
+  height: 3px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.convergence-ema-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.convergence-ema-slider {
+  width: 120px;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.convergence-ema-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: 2px solid var(--bg-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.convergence-ema-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: 2px solid var(--bg-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.convergence-ema-value {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  min-width: 2.5em;
+}
+
+.convergence-chart-container {
+  position: relative;
+  height: 360px;
+  width: 100%;
+}
+
+.convergence-chart-container canvas {
+  max-height: 360px;
+}
+
+.convergence-chart-caption {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .convergence-layout {
+    flex-direction: column;
+  }
+  .convergence-buttons {
+    width: 100%;
+    min-width: 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .conv-tab.conv-card {
+    flex: 1;
+    min-width: 180px;
+  }
+}
+
 .rpf-comparison-card-title {
   font-size: 1rem;
   font-weight: 700;
