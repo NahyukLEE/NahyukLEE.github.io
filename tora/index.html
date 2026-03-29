@@ -42,13 +42,17 @@
 
     <div class="authors-list">
       <div class="authors-names">
-        <span class="author-name"><a href="https://nahyuklee.github.io/" target="_blank">Nahyuk Lee</a>*</span>
-        <span class="author-name">Zhiang Chen*</span>
-        <span class="author-name"><a href="https://cvg.ethz.ch/team/Prof-Dr-Marc-Pollefeys" target="_blank">Marc Pollefeys</a></span>
-        <span class="author-name"><a href="https://sunghwanhong.github.io/" target="_blank">Sunghwan Hong</a></span>
+        <span class="author-name"><a href="https://nahyuklee.github.io/" target="_blank">Nahyuk Lee</a> <sup>1,*</sup></span>
+        <span class="author-name">Zhiang Chen <sup>2,*</sup></span>
+        <span class="author-name"><a href="https://cvg.ethz.ch/team/Prof-Dr-Marc-Pollefeys" target="_blank">Marc Pollefeys</a> <sup>2</sup></span>
+        <span class="author-name"><a href="https://sunghwanhong.github.io/" target="_blank">Sunghwan Hong</a> <sup>2,3</sup></span>
       </div>
-      <div class="authors-affiliation">ETH Zurich</div>
-      <div class="authors-note">*Equal contribution</div>
+      <div class="authors-affiliation">
+        <sup>1</sup> Independent Researcher &nbsp;&nbsp;
+        <sup>2</sup> <a href="https://ethz.ch/en.html" target="_blank">ETH Zurich</a> &nbsp;&nbsp;
+        <sup>3</sup> <a href="https://ai.ethz.ch/" target="_blank">ETH AI Center</a>
+      </div>
+      <div class="authors-note">* Equal contribution</div>
     </div>
 
     <div class="link-buttons">
@@ -479,12 +483,11 @@
       <button class="copy-btn" onclick="copyBibtex()">
         <i class="fas fa-copy"></i> Copy
       </button>
-      <pre class="bibtex-code" id="bibtex-text">@inproceedings{anonymous2026tora,
-  title     = {TORA: Topological Representation Alignment
-               for 3D Shape Assembly},
+      <!-- <pre class="bibtex-code" id="bibtex-text">@inproceedings{lee2026tora,
+  title     = {TORA: Topological Representation Alignment for 3D Shape Assembly},
   author    = {Lee, Nahyuk and Chen, Zhiang and Pollefeys, Marc and Hong, Sunghwan},
   year      = {2026}
-}</pre>
+}</pre> -->
     </div>
   </div>
 </section>
@@ -506,11 +509,20 @@
   import {
     initAssemblyViewer,
     initComparisonViewers,
-    initSliderViewer
+    initSliderViewer,
+    initJsonComparisonViewers
   } from './js/point-cloud-viewer.js';
 
   let teaserViewer = null;
   let sliderViewer = null;
+
+  // Real JSON samples per dataset tab
+  const DATASET_JSON = {
+    'geometric':     { folder: 'everyday1', files: ['everyday_Bottle_8cd9b10f611ac28e866a1445c8fba9da_mode_10_gen03.json','everyday_Bottle_e593aa021f3fa324530647fc03dd20dc_mode_16_gen01.json','everyday_Mirror_b5787ebfe1c5b31f68661782af60b711_mode_8_gen03.json','everyday_Mug_1ea9ea99ac8ed233bf355ac8109b9988_mode_10_gen01.json','everyday_ToyFigure_2acb67458c17af08c4b494041bc63422_mode_14_gen02.json','everyday_Vase_2ec608cc4d3287bb92e0b07fda7527d0_mode_18_gen01.json'] },
+    'many-part':     { folder: 'everyday2', files: ['everyday_Bottle_d7305324e9dd49eccee5e41d780064a2_mode_19_gen02.json','everyday_Bowl_594b22f21daf33ce6aea2f18ee404fd5_mode_18_gen02.json','everyday_Cup_3a3b19614d545834cd321262c762dc9_mode_15_gen02.json','everyday_Mirror_a89028302dffd469b571d24e2980d466_mode_6_gen02.json','everyday_Spoon_9729770f5437f768638735e451972522_mode_11_gen03.json','everyday_ToyFigure_29a37eb86f4677163f6b1b708c713b4a_fractured_68_gen01.json'] },
+    'semantic':      { folder: 'partnet',   files: ['partnet_v0_13952_fractured_original_gen01.json','partnet_v0_15664_fractured_original_gen01.json','partnet_v0_19385_fractured_original_gen01.json','partnet_v0_26125_fractured_original_gen03.json','partnet_v0_41988_fractured_original_gen01.json','partnet_v0_45236_fractured_original_gen01.json','partnet_v0_47078_fractured_original_gen02.json'] },
+    'inter-object':  { folder: 'twobytwo',  files: ['twobytwo_Kettle_partnet_processed_102730_original_gen02.json','twobytwo_bolt_nut_pairwise_8_original_gen02.json','twobytwo_bottle_partnet_processed_3830_original_gen02.json','twobytwo_key_lock_pairwise_14_original_gen02.json','twobytwo_pairwise_toilet_17_original_gen02.json','twobytwo_plate_kettle_30_original_gen03.json','twobytwo_postbox_pairwise_15_original_gen02.json','twobytwo_toaster_103502_original_gen02.json','twobytwo_usb_cap_12_original_gen02.json'] },
+  };
 
   window.addEventListener('DOMContentLoaded', () => {
     teaserViewer = initAssemblyViewer('teaser-viewer', 'chair');
@@ -520,19 +532,41 @@
       'chair'
     );
 
-    const datasetShapeMap = { geometric: 'chair', 'many-part': 'table', semantic: 'vase', 'inter-object': 'bowl' };
-    const datasetComparisonViewers = initComparisonViewers(
-      ['comp-dataset-input', 'comp-dataset-rpf', 'comp-dataset-ours', 'comp-dataset-gt'],
-      'chair'
+    const jsonViewers = initJsonComparisonViewers(
+      ['comp-dataset-input', 'comp-dataset-rpf', 'comp-dataset-ours', 'comp-dataset-gt']
     );
 
     sliderViewer = initSliderViewer(
       'slider-viewer', 'assembly-slider', 'slider-value', 'chair'
     );
 
+    let currentDataset = 'geometric';
+    let currentSampleIndex = 0;
+
+    function getSampleUrl(dataset, index) {
+      const cfg = DATASET_JSON[dataset];
+      if (!cfg) return null;
+      const file = cfg.files[index % cfg.files.length];
+      return `json/${cfg.folder}/${file}`;
+    }
+
+    function updateSampleButtons(dataset) {
+      const sampleBtnsEl = document.getElementById('dataset-sample-buttons');
+      if (!sampleBtnsEl) return;
+      const count = DATASET_JSON[dataset]?.files.length || 6;
+      sampleBtnsEl.innerHTML = Array.from({ length: count }, (_, i) =>
+        `<button type="button" class="sample-btn${i === 0 ? ' active' : ''}" data-sample="${i}">${i + 1}</button>`
+      ).join('');
+    }
+
+    // Load initial sample
+    updateSampleButtons(currentDataset);
+    jsonViewers.loadSample(getSampleUrl(currentDataset, 0));
+
     const datasetTabsEl = document.getElementById('dataset-tabs');
     const sampleBtnsEl = document.getElementById('dataset-sample-buttons');
-    if (datasetTabsEl && datasetComparisonViewers) {
+
+    if (datasetTabsEl) {
       datasetTabsEl.addEventListener('click', (e) => {
         const tab = e.target.closest('.dataset-tab');
         if (!tab) return;
@@ -540,13 +574,10 @@
         if (!dataset) return;
         document.querySelectorAll('.dataset-tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
-        const shapeName = datasetShapeMap[dataset] || 'chair';
-        datasetComparisonViewers.setShape(shapeName);
-        if (sampleBtnsEl) {
-          sampleBtnsEl.querySelectorAll('.sample-btn').forEach((btn, i) => {
-            btn.classList.toggle('active', i === 0);
-          });
-        }
+        currentDataset = dataset;
+        currentSampleIndex = 0;
+        updateSampleButtons(dataset);
+        jsonViewers.loadSample(getSampleUrl(dataset, 0));
       });
       datasetTabsEl.addEventListener('keydown', (e) => {
         const tab = e.target.closest('.dataset-tab');
@@ -555,14 +586,16 @@
         tab.click();
       });
     }
-    if (sampleBtnsEl && datasetComparisonViewers) {
+
+    if (sampleBtnsEl) {
       sampleBtnsEl.addEventListener('click', (e) => {
         const btn = e.target.closest('.sample-btn');
         if (!btn) return;
         const index = parseInt(btn.getAttribute('data-sample'), 10);
-        if (isNaN(index) || index < 0 || index > 5) return;
-        datasetComparisonViewers.setSample(index);
+        if (isNaN(index)) return;
+        currentSampleIndex = index;
         sampleBtnsEl.querySelectorAll('.sample-btn').forEach((b, i) => b.classList.toggle('active', i === index));
+        jsonViewers.loadSample(getSampleUrl(currentDataset, index));
       });
     }
   });
