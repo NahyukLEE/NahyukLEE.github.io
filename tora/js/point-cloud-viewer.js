@@ -521,6 +521,80 @@ export function initSliderViewer(containerId, sliderId, valueId, shapeName = 'ch
   };
 }
 
+/* JSON-based Comparison Viewer – loads real point cloud samples from JSON files */
+export function initJsonComparisonViewers(containerIds) {
+  const KEYS = ['input', 'rpf', 'ours', 'gt'];
+  const viewers = [];
+
+  KEYS.forEach((key, idx) => {
+    const container = document.getElementById(containerIds[idx]);
+    if (!container) return;
+    const { scene, controls } = createViewer(container, {
+      cameraPos: [0, 0.5, 3.0],
+      autoRotate: true,
+    });
+    controls.autoRotateSpeed = 1.2;
+    viewers.push({ scene, controls, meshes: [], key });
+  });
+
+  // Sync camera across all viewers
+  let syncing = false;
+  viewers.forEach((v, srcIdx) => {
+    v.controls.addEventListener('change', () => {
+      if (syncing) return;
+      syncing = true;
+      const cam = v.controls.object;
+      const offset = new THREE.Vector3().copy(cam.position).sub(v.controls.target);
+      const sph = new THREE.Spherical().setFromVector3(offset);
+      viewers.forEach((other, otherIdx) => {
+        if (otherIdx === srcIdx) return;
+        const newPos = new THREE.Vector3()
+          .setFromSphericalCoords(sph.radius, sph.phi, sph.theta)
+          .add(other.controls.target);
+        other.controls.object.position.copy(newPos);
+        other.controls.object.lookAt(other.controls.target);
+        other.controls.update();
+      });
+      syncing = false;
+    });
+  });
+
+  function normalizeParts(partsArray) {
+    // Center and scale all parts together
+    let minX = Infinity, minY = Infinity, minZ = Infinity;
+    let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
+    partsArray.forEach(pts => pts.forEach(([x, y, z]) => {
+      if (x < minX) minX = x; if (x > maxX) maxX = x;
+      if (y < minY) minY = y; if (y > maxY) maxY = y;
+      if (z < minZ) minZ = z; if (z > maxZ) maxZ = z;
+    }));
+    const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2, cz = (minZ + maxZ) / 2;
+    const scale = 1.6 / Math.max(maxX - minX, maxY - minY, maxZ - minZ, 0.001);
+    return partsArray.map(pts => pts.map(([x, y, z]) => [
+      (x - cx) * scale, (y - cy) * scale, (z - cz) * scale
+    ]));
+  }
+
+  function applyData(data) {
+    // data.parts = [{input, rpf, ours, gt}, ...]
+    viewers.forEach(v => {
+      v.meshes.forEach(m => v.scene.remove(m));
+      const rawParts = data.parts.map(p => p[v.key]);
+      const parts = normalizeParts(rawParts);
+      v.meshes = createPointCloudMesh(parts, v.scene);
+    });
+  }
+
+  return {
+    loadSample(jsonUrl) {
+      fetch(jsonUrl)
+        .then(r => r.json())
+        .then(data => applyData(data))
+        .catch(err => console.error('Failed to load sample:', jsonUrl, err));
+    }
+  };
+}
+
 /* Static Part Viewer */
 export function initStaticViewer(containerId, shapeName = 'chair', mode = 'assembled') {
   const container = document.getElementById(containerId);
