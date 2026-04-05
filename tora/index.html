@@ -58,15 +58,15 @@
     <div class="link-buttons">
       <a href="#" class="link-btn primary">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-        arXiv
+        arXiv (TBA)
       </a>
       <a href="#" class="link-btn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-        Code
+        Code (TBA)
       </a>
       <a href="#" class="link-btn">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-2.5-6.5c0 .83-.67 1.5-1.5 1.5S7 14.33 7 13.5 7.67 12 8.5 12s1.5.67 1.5 1.5zm5 0c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5zm-2.5 3c-1.66 0-3 1.34-3 3h6c0-1.66-1.34-3-3-3z"/></svg>
-        Hugging Face
+        Hugging Face (TBA)
       </a>
     </div>
 
@@ -379,30 +379,6 @@
 </section>
 
 
-<!-- ============ INTERACTIVE SLIDER ============ -->
-<!-- <section class="content-section">
-  <div class="container">
-    <h2 class="section-title">Assembly Flow Visualization</h2>
-    <p class="section-subtitle">Drag the slider to control the flow from noise (disassembled) to assembled state.</p>
-
-    <div class="assembly-animation-container" id="slider-viewer" style="height: 380px;"></div>
-
-    <div class="slider-container">
-      <label>Disassembled</label>
-      <input type="range" id="assembly-slider" min="0" max="1" step="0.01" value="0">
-      <label>Assembled</label>
-      <span class="slider-val" id="slider-value">0.00</span>
-    </div>
-
-    <div class="category-buttons">
-      <button class="cat-btn active" onclick="switchSliderShape('chair', this)">Chair</button>
-      <button class="cat-btn" onclick="switchSliderShape('table', this)">Table</button>
-      <button class="cat-btn" onclick="switchSliderShape('vase', this)">Vase</button>
-      <button class="cat-btn" onclick="switchSliderShape('bowl', this)">Bowl</button>
-    </div>
-  </div>
-</section> -->
-
 <!-- ============ CONVERGENCE ============ -->
 <section class="content-section">
   <div class="container">
@@ -447,33 +423,200 @@
   </div>
 </section>
 
-<!-- ============ TEACHER ANALYSIS ============ -->
-<section class="content-section" style="background: var(--bg-white);">
-  <div class="container">
-    <h2 class="section-title">What Makes a Good Teacher?</h2>
-    <p class="section-subtitle">
-      Geometry- and contact-centric properties predict assembly transfer, not semantic classification ability.
-    </p>
 
-    <div class="findings-grid" style="grid-template-columns: repeat(2, 1fr);">
-      <div class="finding-card">
-        <div class="metric" style="font-size: 1.4rem;">r = −0.04</div>
-        <div class="metric-label">Classification Accuracy ↔ Assembly</div>
-        <div class="metric-desc">Near-zero correlation: global semantic understanding does NOT predict assembly quality.</div>
+<!-- ============ ZERO-SHOT TRANSFER ============ -->
+<section class="content-section" style="background: var(--bg-white);">
+  <div class="container wide">
+    <h2 class="section-title">Zero-shot Transfer to Unseen Domains</h2>
+    <p class="section-subtitle">Without any fine-tuning, TORA generalizes across un-seen & real-world fracture, consistently outperforming RPF.<br> Higher Part Accuracy ↑ is better; lower Rotation Error ↓ and Translation Error ↓ are better.</p>
+
+    <div class="rpf-comparison-grid dataset-tabs" id="zeroshot-tabs">
+
+      <div class="rpf-comparison-card dataset-tab active" data-dataset="artifact" role="button" tabindex="0">
+        <div class="rpf-comparison-card-title">Breaking Bad - Artifact</div>
+        <div class="rpf-comparison-card-sub">Synthetic multi-part geometric assembly</div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Part Accuracy ↑</span>
+          <div class="comparison-row">
+            <span class="comparison-label">RPF</span>
+            <div class="comparison-bar-wrap"><div class="comparison-bar rpf" style="width: 25%;"></div></div>
+            <span class="comparison-val">88.3%</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap"><div class="comparison-bar tora" style="width: 65%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">94.4%</span>
+              <span class="comparison-improve">+6.1%</span>
+            </div>
+          </div>
+        </div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Rotation Error ↓</span>
+          <div class="comparison-row">
+            <span class="comparison-label">RPF</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar rpf" style="width: 82%;"></div></div>
+            <span class="comparison-val">20.9°</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar tora" style="width: 14%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">8.0°</span>
+              <span class="comparison-improve">62% ↓</span>
+            </div>
+          </div>
+        </div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Translation Error ↓</span>
+          <div class="comparison-row">
+            <span class="comparison-label">RPF</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar rpf" style="width: 82%;"></div></div>
+            <span class="comparison-val">5.3 cm</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar tora" style="width: 18%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">2.1 cm</span>
+              <span class="comparison-improve">60% ↓</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="finding-card">
-        <div class="metric" style="font-size: 1.4rem;">r = 0.94</div>
-        <div class="metric-label">Segmentation F1 ↔ Assembly</div>
-        <div class="metric-desc">Strongest correlation: mating-surface segmentation is highly predictive of downstream gains.</div>
+
+      <div class="rpf-comparison-card dataset-tab" data-dataset="fractura" role="button" tabindex="0">
+        <div class="rpf-comparison-card-title">FRACTURA</div>
+        <div class="rpf-comparison-card-sub">Real-world multi-part geomtric assembly</div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Part Accuracy ↑</span>
+          <div class="comparison-row">
+            <span class="comparison-label">RPF</span>
+            <div class="comparison-bar-wrap"><div class="comparison-bar rpf" style="width: 20%;"></div></div>
+            <span class="comparison-val">68.1%</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap"><div class="comparison-bar tora" style="width: 60%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">76.0%</span>
+              <span class="comparison-improve">+7.9%</span>
+            </div>
+          </div>
+        </div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Rotation Error ↓</span>
+          <div class="comparison-row">
+            <span class="comparison-label">RPF</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar rpf" style="width: 80%;"></div></div>
+            <span class="comparison-val">50.1°</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar tora" style="width: 55%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">36.4°</span>
+              <span class="comparison-improve">27% ↓</span>
+            </div>
+          </div>
+        </div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Translation Error ↓</span>
+          <div class="comparison-row">
+            <span class="comparison-label">RPF</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar rpf" style="width: 76%;"></div></div>
+            <span class="comparison-val">11.2 cm</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar tora" style="width: 50%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">7.7 cm</span>
+              <span class="comparison-improve">31% ↓</span>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <div class="rpf-comparison-card dataset-tab" data-dataset="fantastic_breaks" role="button" tabindex="0">
+        <div class="rpf-comparison-card-title">Fantastic Breaks</div>
+        <div class="rpf-comparison-card-sub">Real-world 2-part geometric assembly</div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Part Accuracy ↑</span>
+          <div class="comparison-row">
+            <span class="comparison-label">RPF</span>
+            <div class="comparison-bar-wrap"><div class="comparison-bar rpf" style="width: 47%;"></div></div>
+            <span class="comparison-val">96.9%</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap"><div class="comparison-bar tora" style="width: 56%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">97.2%</span>
+              <span class="comparison-improve">+0.3%</span>
+            </div>
+          </div>
+        </div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Rotation Error ↓</span>
+          <div class="comparison-row">
+            <span class="comparison-label">RPF</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar rpf" style="width: 64%;"></div></div>
+            <span class="comparison-val">6.3°</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar tora" style="width: 28%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">3.5°</span>
+              <span class="comparison-improve">44% ↓</span>
+            </div>
+          </div>
+        </div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Translation Error ↓</span>
+          <div class="comparison-row">
+            <span class="comparison-label">RPF</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar rpf" style="width: 62%;"></div></div>
+            <span class="comparison-val">1.5 cm</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar tora" style="width: 24%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">0.9 cm</span>
+              <span class="comparison-improve">40% ↓</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <p style="text-align: center; margin-top: 20px; font-size: 0.92rem; color: var(--text-body); max-width: 700px; margin-left: auto; margin-right: auto;">
-      We adopt <strong>Uni3D</strong> as the default teacher, as it consistently achieves the strongest geometry/contact
-      probe performance and yields the best downstream assembly accuracy across all alignment objectives.
-    </p>
+    <div class="dataset-example-panels">
+      <div class="comparison-grid" id="zeroshot-comparison-grid">
+        <div>
+          <div class="comparison-col-label">Input</div>
+          <div class="comparison-viewer" id="comp-zeroshot-input"></div>
+        </div>
+        <div>
+          <div class="comparison-col-label">RPF</div>
+          <div class="comparison-viewer" id="comp-zeroshot-rpf"></div>
+        </div>
+        <div>
+          <div class="comparison-col-label">Ours</div>
+          <div class="comparison-viewer" id="comp-zeroshot-ours"></div>
+        </div>
+        <div>
+          <div class="comparison-col-label">GT</div>
+          <div class="comparison-viewer" id="comp-zeroshot-gt"></div>
+        </div>
+      </div>
+      <div class="sample-buttons" id="zeroshot-sample-buttons"></div>
+    </div>
   </div>
 </section>
+
 
 <!-- ============ BIBTEX ============ -->
 <section class="content-section">
@@ -483,26 +626,16 @@
       <button class="copy-btn" onclick="copyBibtex()">
         <i class="fas fa-copy"></i> Copy
       </button>
-      <!-- <pre class="bibtex-code" id="bibtex-text">@inproceedings{lee2026tora,
+      <pre class="bibtex-code" id="bibtex-text">@article{lee2026tora,
   title     = {TORA: Topological Representation Alignment for 3D Shape Assembly},
   author    = {Lee, Nahyuk and Chen, Zhiang and Pollefeys, Marc and Hong, Sunghwan},
+  journal   = {arXiv preprint arXiv:},
   year      = {2026}
-}</pre> -->
+}</pre>
     </div>
   </div>
 </section>
 
-<!-- ============ FOOTER ============ -->
-<footer class="footer-section">
-  <div class="container">
-    <p>
-      This website template is inspired by
-      <a href="https://rectified-pointflow.github.io/" target="_blank">Rectified Point Flow</a> and
-      <a href="https://ai4ce.github.io/GARF/" target="_blank">GARF</a>.
-      The point cloud visualizations are rendered with <a href="https://threejs.org/" target="_blank">Three.js</a>.
-    </p>
-  </div>
-</footer>
 
 <!-- ============ SCRIPTS ============ -->
 <script type="module">
@@ -522,6 +655,13 @@
     'many-part':     { folder: 'everyday2', files: ['everyday_Bottle_d7305324e9dd49eccee5e41d780064a2_mode_19_gen02.json','everyday_Bowl_594b22f21daf33ce6aea2f18ee404fd5_mode_18_gen02.json','everyday_Cup_3a3b19614d545834cd321262c762dc9_mode_15_gen02.json','everyday_Mirror_a89028302dffd469b571d24e2980d466_mode_6_gen02.json','everyday_Spoon_9729770f5437f768638735e451972522_mode_11_gen03.json','everyday_ToyFigure_29a37eb86f4677163f6b1b708c713b4a_fractured_68_gen01.json'] },
     'semantic':      { folder: 'partnet',   files: ['partnet_v0_13952_fractured_original_gen01.json','partnet_v0_15664_fractured_original_gen01.json','partnet_v0_19385_fractured_original_gen01.json','partnet_v0_26125_fractured_original_gen03.json','partnet_v0_41988_fractured_original_gen01.json','partnet_v0_45236_fractured_original_gen01.json','partnet_v0_47078_fractured_original_gen02.json'] },
     'inter-object':  { folder: 'twobytwo',  files: ['twobytwo_Kettle_partnet_processed_102730_original_gen02.json','twobytwo_bolt_nut_pairwise_8_original_gen02.json','twobytwo_bottle_partnet_processed_3830_original_gen02.json','twobytwo_key_lock_pairwise_14_original_gen02.json','twobytwo_pairwise_toilet_17_original_gen02.json','twobytwo_plate_kettle_30_original_gen03.json','twobytwo_postbox_pairwise_15_original_gen02.json','twobytwo_toaster_103502_original_gen02.json','twobytwo_usb_cap_12_original_gen02.json'] },
+  };
+
+  // Zero-shot transfer JSON samples
+  const ZEROSHOT_JSON = {
+    'artifact':        { folder: 'artifact',        files: ['1344038_sf_mode_7_gen02.json','1344046_sf_mode_17_gen03.json','437347_sf_mode_15_gen01.json','437348_sf_mode_8_gen01.json','75361_sf_mode_15_gen02.json','92880_sf_fractured_45_gen02.json'] },
+    'fractura':        { folder: 'fractura',         files: ['hip_synthetic_fracture_000006979_mode_7_gen03.json','leg_synthetic_fracture_000001248_mode_4_gen01.json','pig_synthetic_fracture_20_mode_6_gen01.json','pig_synthetic_fracture_3_mode_3_gen02.json','pig_synthetic_fracture_5_fractured_9_gen02.json','rib_synthetic_fracture_000004661_mode_5_gen03.json'] },
+    'fantastic_breaks': { folder: 'fantastic_breaks', files: ['00_00022_gen01.json','01_01014_gen02.json','05_05003_gen01.json','07_07004_gen01.json','09_09004_gen01.json','09_09029_gen01.json','19_19001_gen03.json'] },
   };
 
   window.addEventListener('DOMContentLoaded', () => {
@@ -572,7 +712,7 @@
         if (!tab) return;
         const dataset = tab.getAttribute('data-dataset');
         if (!dataset) return;
-        document.querySelectorAll('.dataset-tab').forEach(t => t.classList.remove('active'));
+        datasetTabsEl.querySelectorAll('.dataset-tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
         currentDataset = dataset;
         currentSampleIndex = 0;
@@ -596,6 +736,69 @@
         currentSampleIndex = index;
         sampleBtnsEl.querySelectorAll('.sample-btn').forEach((b, i) => b.classList.toggle('active', i === index));
         jsonViewers.loadSample(getSampleUrl(currentDataset, index));
+      });
+    }
+
+    // ---- Zero-shot transfer section ----
+    const zeroshotViewers = initJsonComparisonViewers(
+      ['comp-zeroshot-input', 'comp-zeroshot-rpf', 'comp-zeroshot-ours', 'comp-zeroshot-gt']
+    );
+
+    let currentZeroshot = 'artifact';
+    let currentZeroshotIndex = 0;
+
+    function getZeroshotUrl(dataset, index) {
+      const cfg = ZEROSHOT_JSON[dataset];
+      if (!cfg) return null;
+      const file = cfg.files[index % cfg.files.length];
+      return `json/${cfg.folder}/${file}`;
+    }
+
+    function updateZeroshotButtons(dataset) {
+      const btnsEl = document.getElementById('zeroshot-sample-buttons');
+      if (!btnsEl) return;
+      const count = ZEROSHOT_JSON[dataset]?.files.length || 6;
+      btnsEl.innerHTML = Array.from({ length: count }, (_, i) =>
+        `<button type="button" class="sample-btn${i === 0 ? ' active' : ''}" data-sample="${i}">${i + 1}</button>`
+      ).join('');
+    }
+
+    updateZeroshotButtons(currentZeroshot);
+    zeroshotViewers.loadSample(getZeroshotUrl(currentZeroshot, 0));
+
+    const zeroshotTabsEl = document.getElementById('zeroshot-tabs');
+    const zeroshotBtnsEl = document.getElementById('zeroshot-sample-buttons');
+
+    if (zeroshotTabsEl) {
+      zeroshotTabsEl.addEventListener('click', (e) => {
+        const tab = e.target.closest('.dataset-tab');
+        if (!tab) return;
+        const dataset = tab.getAttribute('data-dataset');
+        if (!dataset) return;
+        zeroshotTabsEl.querySelectorAll('.dataset-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentZeroshot = dataset;
+        currentZeroshotIndex = 0;
+        updateZeroshotButtons(dataset);
+        zeroshotViewers.loadSample(getZeroshotUrl(dataset, 0));
+      });
+      zeroshotTabsEl.addEventListener('keydown', (e) => {
+        const tab = e.target.closest('.dataset-tab');
+        if (!tab || (e.key !== 'Enter' && e.key !== ' ')) return;
+        e.preventDefault();
+        tab.click();
+      });
+    }
+
+    if (zeroshotBtnsEl) {
+      zeroshotBtnsEl.addEventListener('click', (e) => {
+        const btn = e.target.closest('.sample-btn');
+        if (!btn) return;
+        const index = parseInt(btn.getAttribute('data-sample'), 10);
+        if (isNaN(index)) return;
+        currentZeroshotIndex = index;
+        zeroshotBtnsEl.querySelectorAll('.sample-btn').forEach((b, i) => b.classList.toggle('active', i === index));
+        zeroshotViewers.loadSample(getZeroshotUrl(currentZeroshot, index));
       });
     }
   });
