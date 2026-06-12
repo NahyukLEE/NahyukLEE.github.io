@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="PROSE: Training-Free Egocentric Scene Registration with Vision-Language Models">
+  <meta name="keywords" content="scene registration, vision-language models, egocentric perception, scene graphs, training-free, 3D scene understanding">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PROSE: Training-Free Egocentric Scene Registration with Vision-Language Models</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://esm.sh/three@0.162.0",
+      "three/addons/": "https://esm.sh/three@0.162.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+
+<body>
+
+<!-- ============ HERO ============ -->
+<section class="hero-section">
+  <div class="container">
+    <h1 class="publication-title">
+      <span class="highlight">PROSE</span>: Training-Free Egocentric Scene Registration<br>with Vision-Language Models
+    </h1>
+
+    <div class="authors-list">
+      <div class="authors-names">
+        <span class="author-name"><a href="https://RCKola.github.io/" target="_blank">Zhiang Chen</a> <sup>1,*</sup></span>
+        <span class="author-name"><a href="https://nahyuklee.github.io/" target="_blank">Nahyuk Lee</a> <sup>*</sup></span>
+        <span class="author-name"><a href="https://boysun045.github.io/boysun-website/" target="_blank">Boyang Sun</a> <sup>1</sup></span>
+        <span class="author-name"><a href="https://taeinkwon.com/" target="_blank">Taein Kwon</a> <sup>2</sup></span>
+        <span class="author-name"><a href="https://cvg.ethz.ch/team/Prof-Dr-Marc-Pollefeys" target="_blank">Marc Pollefeys</a> <sup>1</sup></span>
+        <span class="author-name"><a href="https://zuriabauer.com/" target="_blank">Zuria Bauer</a> <sup>1,&dagger;</sup></span>
+        <span class="author-name"><a href="https://sunghwanhong.github.io/" target="_blank">Sunghwan Hong</a> <sup>1,3,&dagger;</sup></span>
+      </div>
+      <div class="authors-affiliation">
+        <sup>1</sup> <a href="https://ethz.ch/en.html" target="_blank">ETH Zurich</a> &nbsp;&nbsp;
+        <sup>2</sup> <a href="https://www.robots.ox.ac.uk/~vgg/" target="_blank">VGG, University of Oxford</a> &nbsp;&nbsp;
+        <sup>3</sup> <a href="https://ai.ethz.ch/" target="_blank">ETH AI Center</a>
+      </div>
+      <div class="authors-note">* Equal contribution &nbsp;&middot;&nbsp; &dagger; Equal advising</div>
+    </div>
+
+    <div class="link-buttons">
+      <!-- TODO: replace # with the arXiv link once available -->
+      <a href="#" class="link-btn primary disabled" title="Coming soon">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+        arXiv (soon)
+      </a>
+      <!-- TODO: replace # with the code repository link once released -->
+      <a href="#" class="link-btn disabled" title="Coming soon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        Code (soon)
+      </a>
+      <!-- TODO: replace # with a video link if available -->
+      <a href="#" class="link-btn disabled" title="Coming soon">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        Video (soon)
+      </a>
+    </div>
+
+    <div class="tldr-card">
+      <strong>TL;DR:</strong> A <strong>training-free, RGB-only</strong> pipeline that registers two egocentric captures
+      of the same scene taken at different times: a single pretrained VLM both builds an object-level 3D scene graph
+      per capture and matches instances across them, outperforming geometric and learned scene-graph baselines
+      on Aria Digital Twin &amp; Aria Everyday Activities.
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ TEASER ============ -->
+<section class="content-section" style="background: var(--bg-white);">
+  <div class="container">
+    <div class="method-figure">
+      <img src="static/images/teaser.png" alt="PROSE teaser: scene representation, cross-scan instance correspondence, and registered scene">
+      <p class="caption">
+        Given two egocentric RGB sequences of the same indoor space captured at different times,
+        <span class="method-name">PROSE</span> recovers the rigid transform aligning them — and produces an
+        open-vocabulary 3D scene graph for each capture along the way.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ ABSTRACT & KEY FINDINGS ============ -->
+<section class="content-section" style="background: var(--bg-light);">
+  <div class="container">
+    <h2 class="section-title">Abstract</h2>
+    <p class="abstract-text">
+      Registering two captures of the same indoor space taken at different times underpins persistent spatial memory
+      for robots and AR systems, yet the realistic version of this task is egocentric and its most scalable form is
+      RGB-only. Head-mounted cameras yield blurry, fast-moving, partially overlapping views from which dense geometry
+      is hard to recover. Classical registration leans on exactly the clean point clouds this setting lacks, while
+      learned scene-graph methods require a pre-built or annotated graph and a trained matcher that we find brittle
+      under egocentric data. We take a different route, using a pretrained vision-language model as the source of both
+      scene understanding and cross-scan matching. Our method, <span class="method-name">PROSE</span>
+      (<strong>Pro</strong>mpted <strong>S</strong>cene r<strong>E</strong>gistration), lifts each RGB sequence into an
+      object-level 3D scene graph using off-the-shelf foundation models for geometry, segmentation, and language, then
+      prompts the same VLM to match object instances across the two RGB sequences. To make this matching tractable and
+      reliable, we leverage object heights as a prior and verify each proposed match with a paired same/different
+      query, then solve for the rigid transform by hypothesizing a candidate per matched object and selecting the one
+      with the strongest geometric consensus. <span class="method-name">PROSE</span> adds <strong>no learned
+      parameters</strong> and requires <strong>no depth sensor, training, or annotated graph</strong>. On the
+      egocentric Aria Digital Twin and Aria Everyday Activities benchmarks, it outperforms both geometric and learned
+      scene-graph baselines in registration accuracy, on ground-truth and RGB-reconstructed point clouds alike, and
+      the scene graph it produces transfers directly to downstream tasks.
+    </p>
+
+    <div class="ego-strip">
+      <div class="ego-group src">
+        <div class="ego-frames">
+          <img src="static/images/ego_src1.png" alt="Egocentric RGB view of the scene at time t0">
+          <img src="static/images/ego_src2.png" alt="Another egocentric RGB view of the scene at time t0">
+        </div>
+        <div class="ego-label"><span class="ego-dot src"></span>Source scan · egocentric RGB at <em>t</em><sub>0</sub></div>
+      </div>
+      <div class="ego-group ref">
+        <div class="ego-frames">
+          <img src="static/images/ego_ref1.png" alt="Egocentric RGB view of the same scene at time t1">
+          <img src="static/images/ego_ref2.png" alt="Another egocentric RGB view of the same scene at time t1">
+        </div>
+        <div class="ego-label"><span class="ego-dot ref"></span>Reference scan · egocentric RGB at <em>t</em><sub>1</sub></div>
+      </div>
+    </div>
+    <p class="viewer-note">The actual input: head-mounted egocentric RGB views of the same scene, captured at different times (Aria Digital Twin).</p>
+
+    <div class="findings-grid">
+      <div class="finding-card">
+        <div class="metric">0</div>
+        <div class="metric-label">Learned Parameters</div>
+        <div class="metric-desc">Entirely training-free: geometry, segmentation, and matching all come from off-the-shelf foundation models prompted at inference time.</div>
+      </div>
+      <div class="finding-card">
+        <div class="metric">89.2%</div>
+        <div class="metric-label">Registration Recall on ADT</div>
+        <div class="metric-desc">Best registration recall on ground-truth clouds, improving over the strongest geometric baseline (80.3%) and far ahead of SG-Reg (46.9%).</div>
+      </div>
+      <div class="finding-card">
+        <div class="metric">+22.6%</div>
+        <div class="metric-label">RR Gain on AEA, RGB-only</div>
+        <div class="metric-desc">When point clouds must be reconstructed from RGB, PROSE reaches 65.5% recall vs. 42.9% for TEASER++ — the lead grows as geometry degrades.</div>
+      </div>
+      <div class="finding-card">
+        <div class="metric">3.4×</div>
+        <div class="metric-label">More Precise Correspondences</div>
+        <div class="metric-desc">70.4% node precision on ADT instance matching, vs. 20.8% for SG-Reg and 14.2% for GDino+CLIP embedding matching.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ METHOD ============ -->
+<section class="content-section" style="background: var(--bg-white);">
+  <div class="container">
+    <h2 class="section-title">How PROSE Works</h2>
+    <p class="section-subtitle">A single pretrained VLM drives both scene understanding and cross-scan matching — no fine-tuning anywhere in the pipeline.</p>
+
+    <div class="method-figure">
+      <img src="static/images/pipeline.png" alt="PROSE pipeline: scene parsing, height-binned correspondence and verification, instance-level scene graph matching, pose hypothesis and voting">
+      <p class="caption">
+        From two egocentric RGB scans of the same scene at different times, <span class="method-name">PROSE</span>
+        parses each into a per-scan 3D scene graph, matches instances across scans, and estimates the rigid transform
+        by generating one candidate per matched pair and selecting the highest-inlier-ratio hypothesis.
+      </p>
+    </div>
+
+    <div class="pipeline-grid">
+      <div class="pipeline-card">
+        <div class="pipeline-step">1</div>
+        <h3>Scene Parsing</h3>
+        <p>
+          Each RGB sequence is lifted to per-frame depth and poses by a geometric foundation model. A VLM lists the
+          scene's landmark objects, SAM&nbsp;3 turns the names into temporally consistent instance masks, and a
+          voxel-revote fusion step consolidates everything into an object-level 3D scene graph per scan.
+        </p>
+        <div class="pipeline-models">
+          <span class="pipeline-tag">VGGT-&Omega;</span>
+          <span class="pipeline-tag">Qwen3.6-27B</span>
+          <span class="pipeline-tag">SAM 3</span>
+        </div>
+      </div>
+      <div class="pipeline-card">
+        <div class="pipeline-step">2</div>
+        <h3>Height-Binned Correspondence</h3>
+        <p>
+          Instances are split into quantile bins along the gravity axis, so a ceiling lamp never competes with a floor
+          rug. Within each bin, the VLM matches crops labeled with shared-namespace Set-of-Marks markers, and every
+          candidate is re-checked with paired <em>same?</em>/<em>different?</em> prompts to expose hallucinated matches.
+        </p>
+        <div class="pipeline-models">
+          <span class="pipeline-tag">K = 5 height bins</span>
+          <span class="pipeline-tag">Set-of-Marks</span>
+          <span class="pipeline-tag">2&times; verification</span>
+        </div>
+      </div>
+      <div class="pipeline-card">
+        <div class="pipeline-step">3</div>
+        <h3>Pose Hypothesis &amp; Voting</h3>
+        <p>
+          Each matched pair yields its own rigid-transform hypothesis via per-instance RANSAC on descriptor
+          correspondences. Hypotheses are scored by scene-wide inlier ratio and the strongest geometric consensus wins —
+          so a minority of bad matches cannot corrupt the final transform.
+        </p>
+        <div class="pipeline-models">
+          <span class="pipeline-tag">FCGF / FPFH / GeoTrans</span>
+          <span class="pipeline-tag">RANSAC</span>
+          <span class="pipeline-tag">Inlier-ratio voting</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ REGISTRATION RESULTS ============ -->
+<section class="content-section" style="background: var(--bg-light);">
+  <div class="container wide">
+    <h2 class="section-title">Registration: Ahead on Clean Clouds, Far Ahead on RGB-Only</h2>
+    <p class="section-subtitle">
+      PROSE vs. the strongest scene-level baseline (TEASER++) in each setting. Higher RR ↑ is better;
+      lower RRE ↓ and RTE ↓ are better. The lead widens exactly where it matters: clouds reconstructed from RGB.
+    </p>
+
+    <div class="baseline-comparison-grid">
+      <div class="baseline-comparison-card">
+        <div class="baseline-comparison-card-title"><span class="card-kw">ADT</span> · ground-truth clouds</div>
+        <div class="baseline-comparison-card-sub">Aria Digital Twin, GT point clouds (Ours w/ FCGF)</div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Registration Recall ↑</span>
+          <div class="comparison-row">
+            <span class="comparison-label">TEASER++</span>
+            <div class="comparison-bar-wrap"><div class="comparison-bar baseline" style="width: 48%;"></div></div>
+            <span class="comparison-val">80.3%</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap"><div class="comparison-bar prose" style="width: 78%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">89.2%</span>
+              <span class="comparison-improve">+8.9%</span>
+            </div>
+          </div>
+        </div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Rotation Error ↓</span>
+          <div class="comparison-row">
+            <span class="comparison-label">TEASER++</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar baseline" style="width: 72%;"></div></div>
+            <span class="comparison-val">8.83°</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar prose" style="width: 32%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">4.16°</span>
+              <span class="comparison-improve">53% ↓</span>
+            </div>
+          </div>
+        </div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Translation Error ↓</span>
+          <div class="comparison-row">
+            <span class="comparison-label">TEASER++</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar baseline" style="width: 72%;"></div></div>
+            <span class="comparison-val">0.40 m</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar prose" style="width: 28%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">0.17 m</span>
+              <span class="comparison-improve">58% ↓</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="baseline-comparison-card">
+        <div class="baseline-comparison-card-title"><span class="card-kw">ADT</span> · RGB-reconstructed clouds</div>
+        <div class="baseline-comparison-card-sub">Sensor-free setting, VGGT-&Omega; predicted clouds (Ours w/ GeoTrans)</div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Registration Recall ↑</span>
+          <div class="comparison-row">
+            <span class="comparison-label">TEASER++</span>
+            <div class="comparison-bar-wrap"><div class="comparison-bar baseline" style="width: 30%;"></div></div>
+            <span class="comparison-val">44.4%</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap"><div class="comparison-bar prose" style="width: 62%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">56.2%</span>
+              <span class="comparison-improve">+11.8%</span>
+            </div>
+          </div>
+        </div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Rotation Error ↓</span>
+          <div class="comparison-row">
+            <span class="comparison-label">TEASER++</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar baseline" style="width: 80%;"></div></div>
+            <span class="comparison-val">17.11°</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar prose" style="width: 52%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">12.55°</span>
+              <span class="comparison-improve">27% ↓</span>
+            </div>
+          </div>
+        </div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Translation Error ↓</span>
+          <div class="comparison-row">
+            <span class="comparison-label">TEASER++</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar baseline" style="width: 80%;"></div></div>
+            <span class="comparison-val">0.97 m</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar prose" style="width: 46%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">0.59 m</span>
+              <span class="comparison-improve">39% ↓</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="baseline-comparison-card">
+        <div class="baseline-comparison-card-title"><span class="card-kw">AEA</span> · RGB-reconstructed clouds</div>
+        <div class="baseline-comparison-card-sub">Aria Everyday Activities, VGGT-&Omega; predicted clouds (Ours w/ GeoTrans)</div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Registration Recall ↑</span>
+          <div class="comparison-row">
+            <span class="comparison-label">TEASER++</span>
+            <div class="comparison-bar-wrap"><div class="comparison-bar baseline" style="width: 28%;"></div></div>
+            <span class="comparison-val">42.9%</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap"><div class="comparison-bar prose" style="width: 70%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">65.5%</span>
+              <span class="comparison-improve">+22.6%</span>
+            </div>
+          </div>
+        </div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Rotation Error ↓</span>
+          <div class="comparison-row">
+            <span class="comparison-label">TEASER++</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar baseline" style="width: 80%;"></div></div>
+            <span class="comparison-val">18.87°</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar prose" style="width: 52%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">12.71°</span>
+              <span class="comparison-improve">33% ↓</span>
+            </div>
+          </div>
+        </div>
+        <div class="comparison-metric">
+          <span class="comparison-metric-name">Translation Error ↓</span>
+          <div class="comparison-row">
+            <span class="comparison-label">TEASER++</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar baseline" style="width: 80%;"></div></div>
+            <span class="comparison-val">2.55 m</span>
+          </div>
+          <div class="comparison-row ours">
+            <span class="comparison-label comparison-label-ours">Ours</span>
+            <div class="comparison-bar-wrap inv"><div class="comparison-bar prose" style="width: 42%;"></div></div>
+            <div class="comparison-val-wrap">
+              <span class="comparison-val">1.39 m</span>
+              <span class="comparison-improve">45% ↓</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dataset-example-panels">
+      <h2 class="section-title" style="margin-top: 56px;">Qualitative Examples</h2>
+      <div class="comparison-grid" id="registration-comparison-grid">
+        <div>
+          <div class="comparison-col-label">TEASER++</div>
+          <div class="comparison-viewer" id="comp-reg-teaser"></div>
+        </div>
+        <div>
+          <div class="comparison-col-label">SG-Reg</div>
+          <div class="comparison-viewer" id="comp-reg-sgreg"></div>
+        </div>
+        <div>
+          <div class="comparison-col-label comparison-col-label-ours">Ours</div>
+          <div class="comparison-viewer" id="comp-reg-ours"></div>
+        </div>
+        <div>
+          <div class="comparison-col-label">GT</div>
+          <div class="comparison-viewer" id="comp-reg-gt"></div>
+        </div>
+      </div>
+      <div class="sample-buttons" id="registration-sample-buttons">
+        <button type="button" class="sample-btn active" data-sample="0">1</button>
+        <button type="button" class="sample-btn" data-sample="1">2</button>
+        <button type="button" class="sample-btn" data-sample="2">3</button>
+        <button type="button" class="sample-btn" data-sample="3">4</button>
+        <button type="button" class="sample-btn" data-sample="4">5</button>
+      </div>
+      <div class="cloud-legend">
+        <span class="legend-item"><span class="legend-dot ref"></span>Reference scan</span>
+        <span class="legend-item"><span class="legend-dot src"></span>Source scan (registered)</span>
+      </div>
+      <!-- TODO: replace procedurally generated sample scenes with real exported point clouds -->
+      <p class="viewer-note">Drag to rotate, scroll to zoom — cameras are synced across panels. Sample (synthetic) point clouds shown for now; real qualitative results coming soon.</p>
+    </div>
+
+    <h2 class="section-title" style="margin-top: 56px;">Full Results</h2>
+    <p class="table-note">Total-split results on ADT and AEA. <strong>Bold</strong> = best, <u>underline</u> = second best within each cloud setting.</p>
+    <div class="results-table-wrapper">
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th rowspan="2" style="text-align:left;">Method</th>
+            <th class="group" colspan="3">ADT · GT clouds</th>
+            <th class="group" colspan="3">ADT · VGGT-&Omega; clouds</th>
+            <th class="group" colspan="3">AEA · VGGT-&Omega; clouds</th>
+          </tr>
+          <tr>
+            <th>RR (%) ↑</th><th>RRE (°) ↓</th><th>RTE (m) ↓</th>
+            <th>RR (%) ↑</th><th>RRE (°) ↓</th><th>RTE (m) ↓</th>
+            <th>RR (%) ↑</th><th>RRE (°) ↓</th><th>RTE (m) ↓</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="method-col">TEASER++ <sub>FPFH</sub></td>
+            <td>80.3</td><td>8.83</td><td>0.40</td>
+            <td>44.4</td><td>17.11</td><td>0.97</td>
+            <td>42.9</td><td>18.87</td><td>2.55</td>
+          </tr>
+          <tr>
+            <td class="method-col">TEASER++ <sub>FCGF</sub></td>
+            <td>79.4</td><td>9.63</td><td>0.44</td>
+            <td class="fail" colspan="3">Fail to converge</td>
+            <td class="fail" colspan="3">Fail to converge</td>
+          </tr>
+          <tr>
+            <td class="method-col">GeoTransformer</td>
+            <td class="fail" colspan="3">Out of Memory</td>
+            <td class="fail" colspan="3">Out of Memory</td>
+            <td class="fail" colspan="3">Out of Memory</td>
+          </tr>
+          <tr>
+            <td class="method-col">BUFFER-X</td>
+            <td>61.7</td><td>10.57</td><td>0.59</td>
+            <td>37.1</td><td>16.95</td><td>1.03</td>
+            <td>34.5</td><td>20.35</td><td>2.44</td>
+          </tr>
+          <tr>
+            <td class="method-col">SG-Reg</td>
+            <td>46.9</td><td>19.76</td><td>2.12</td>
+            <td>19.1</td><td>29.58</td><td>3.27</td>
+            <td>19.4</td><td>27.06</td><td>3.52</td>
+          </tr>
+          <tr class="ours">
+            <td class="method-col">Ours <sub>FPFH</sub></td>
+            <td class="second">82.5</td><td class="second">7.44</td><td class="second">0.30</td>
+            <td>49.9</td><td>15.71</td><td>0.70</td>
+            <td>47.9</td><td>17.91</td><td>1.84</td>
+          </tr>
+          <tr class="ours">
+            <td class="method-col">Ours <sub>FCGF</sub></td>
+            <td class="best">89.2</td><td class="best">4.16</td><td class="best">0.17</td>
+            <td class="second">50.0</td><td class="second">13.21</td><td class="second">0.63</td>
+            <td class="second">58.5</td><td class="best">9.04</td><td class="best">0.99</td>
+          </tr>
+          <tr class="ours">
+            <td class="method-col">Ours <sub>GeoTrans</sub></td>
+            <td>78.8</td><td>8.85</td><td>0.36</td>
+            <td class="best">56.2</td><td class="best">12.55</td><td class="best">0.59</td>
+            <td class="best">65.5</td><td class="second">12.71</td><td class="second">1.39</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-note">
+      No single descriptor backend dominates across the three "Ours" rows — the gains come from the VLM correspondence
+      stage, not the descriptor. GeoTransformer OOMs at scene level but works fine as a PROSE backend, since
+      per-instance registration keeps each problem small.
+    </p>
+  </div>
+</section>
+
+
+<!-- ============ PATH PLANNING ============ -->
+<section class="content-section" style="background: var(--bg-white);">
+  <div class="container">
+    <h2 class="section-title">Downstream: The Scene Graph Plans Paths</h2>
+    <p class="section-subtitle">
+      The same open-vocabulary scene graph that drives registration supports object-goal path planning with RRT
+      on a real iPad capture — emulating a quadruped navigating 50 cm above the floor.
+    </p>
+
+    <div class="figure-two-up">
+      <div class="method-figure">
+        <img src="static/images/robot_demo.png" alt="Photographs of the robotic demo with a Spot quadruped navigating the room">
+        <p class="caption"><strong>Robotic demo.</strong> Real-world assessment with a quadruped robot.</p>
+      </div>
+      <div class="method-figure">
+        <img src="static/images/path_planning_bev.png" alt="Bird's-eye view of the reconstructed open-plan room with the labeled scene graph">
+        <p class="caption"><strong>Bird's-eye view</strong> of the reconstructed open-plan room with the labeled scene graph (in-room vs. out-of-room instances).</p>
+      </div>
+    </div>
+
+    <div class="results-table-wrapper" style="max-width: 760px; margin-left: auto; margin-right: auto;">
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th style="text-align:left;">Method</th>
+            <th>SR<sub>room</sub> ↑</th><th>SR<sub>near</sub> ↑</th><th>SR<sub>far</sub> ↑</th><th>SR<sub>cross</sub> ↑</th>
+            <th>N<sub>inst</sub></th><th>N<sub>pairs</sub></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="method-col">FM-Fusion*</td><td>100*</td><td>100*</td><td>100*</td><td>–</td><td>5</td><td>9</td></tr>
+          <tr><td class="method-col">ConceptGraphs</td><td class="second">46.2</td><td class="second">47.1</td><td class="second">46.8</td><td class="second">38.1</td><td>33</td><td>379</td></tr>
+          <tr class="ours"><td class="method-col">Ours</td><td class="best">49.6</td><td class="best">62.1</td><td class="best">47.1</td><td class="best">40.4</td><td>192</td><td>500</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-note">*FM-Fusion recovers valid graphs for only 2 rooms — its perfect rate reflects negligible coverage, not planning quality.</p>
+  </div>
+</section>
+
+
+<!-- ============ BIBTEX ============ -->
+<section class="content-section" style="background: var(--bg-light);">
+  <div class="container">
+    <h2 class="section-title">BibTeX</h2>
+    <div class="bibtex-wrapper">
+      <button class="copy-btn" onclick="copyBibtex()">
+        <i class="fas fa-copy"></i> Copy
+      </button>
+      <!-- TODO: update the arXiv id once available -->
+      <pre class="bibtex-code" id="bibtex-text">@article{chen2026prose,
+  title     = {PROSE: Training-Free Egocentric Scene Registration with Vision-Language Models},
+  author    = {Chen, Zhiang and Lee, Nahyuk and Sun, Boyang and Kwon, Taein and Pollefeys, Marc and Bauer, Zuria and Hong, Sunghwan},
+  journal   = {arXiv preprint arXiv:XXXX.XXXXX},
+  year      = {2026}
+}</pre>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer-section">
+  <div class="container">
+    This page is based on the <a href="https://nahyuklee.github.io/tora" target="_blank">TORA</a> project page template.
+  </div>
+</footer>
+
+
+<!-- ============ SCRIPTS ============ -->
+<script type="module">
+  import { initRegistrationViewers } from './js/point-cloud-viewer.js';
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const viewers = initRegistrationViewers(
+      ['comp-reg-teaser', 'comp-reg-sgreg', 'comp-reg-ours', 'comp-reg-gt']
+    );
+
+    viewers.loadSample(0);
+
+    const sampleBtnsEl = document.getElementById('registration-sample-buttons');
+    if (sampleBtnsEl) {
+      sampleBtnsEl.addEventListener('click', (e) => {
+        const btn = e.target.closest('.sample-btn');
+        if (!btn) return;
+        const index = parseInt(btn.getAttribute('data-sample'), 10);
+        if (isNaN(index)) return;
+        sampleBtnsEl.querySelectorAll('.sample-btn').forEach((b, i) => b.classList.toggle('active', i === index));
+        viewers.loadSample(index);
+      });
+    }
+  });
+</script>
+
+<script>
+  function copyBibtex() {
+    const text = document.getElementById('bibtex-text').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+      setTimeout(() => {
+        btn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+      }, 2000);
+    });
+  }
+</script>
+
+</body>
+</html>
