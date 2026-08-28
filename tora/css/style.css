@@ -115,6 +115,13 @@ body {
   margin-top: 4px;
 }
 
+.venue-note {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #000000;
+  margin-top: 22px;
+}
+
 .affiliations {
   font-size: 0.9rem;
   color: var(--text-muted);
