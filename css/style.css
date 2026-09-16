@@ -335,19 +335,24 @@ a.ppl:hover { color: var(--accent-hover); }
 /* ===========================
    NEWS
    =========================== */
+.news-heading {
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1.6;
+  color: var(--text);
+  margin: 0 0 2px;
+}
+
 .news-list {
   padding: 0;
 }
 
 .news-item {
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border-light);
+  padding: 2px 0;
   font-size: 12.5px;
-  line-height: 1.5;
-  color: var(--text-secondary);
   line-height: 1.6;
+  color: var(--text-secondary);
 }
-.news-item:last-child { border-bottom: none; }
 .news-item:hover { background: var(--bg-alt); }
 .news-item .news-emoji { margin-right: 4px; }
 .news-item strong { color: var(--text); }
